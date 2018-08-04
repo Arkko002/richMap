@@ -11,6 +11,9 @@
     <OutputPath>.</OutputPath>
     <Name>richMap</Name>
     <RootNamespace>richMap</RootNamespace>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <CommandLineArguments>-r 20-30 -t 127.0.0.1 -s U</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>

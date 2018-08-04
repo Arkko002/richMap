@@ -1,6 +1,7 @@
 import argparse
 import sys
 import scanner
+import ctypes, sys
 
 def parse_args(argv=sys.argv[1:]):
     """Parses the command line arguments"""
@@ -16,6 +17,8 @@ def parse_args(argv=sys.argv[1:]):
 if __name__ == "__main__":
     Arguments = parse_args()
     if Arguments.scan_type == "T":
-        print(scanner.Scanner.tcp_scan(Arguments.target, Arguments.range))
+        scanner.Scanner.tcp_scan(Arguments.target, Arguments.range)
     if Arguments.scan_type == "S":
-        print(scanner.Scanner.syn_scan(Arguments.target, Arguments.range))
+        scanner.Scanner.syn_scan(Arguments.target, Arguments.range)
+    if Arguments.scan_type == "U":
+        scanner.Scanner.udp_scan(Arguments.target, Arguments.range)
