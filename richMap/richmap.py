@@ -1,8 +1,8 @@
 import argparse
-import scanner
+import portscanner
 import netmaper
 import sys
-
+import richgui
 
 def parse_args(argv=sys.argv[1:]):
     """Parses the command line arguments"""
@@ -23,7 +23,7 @@ def parse_args(argv=sys.argv[1:]):
 
 if __name__ == "__main__":
     Arguments = parse_args()
-    Scan = scanner.Scanner()
+    Scan = portscanner.PortScanner()
     Map = netmaper.Netmaper()
 
     if Arguments.scan_type is not None:

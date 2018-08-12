@@ -1,5 +1,6 @@
 import socket
 import packetgenerator
+import os
 from enum import Enum
 
 
@@ -14,7 +15,7 @@ class TcpFlags(Enum):
     FIN = 7
 
 
-class Scanner(object):
+class PortScanner(object):
 
     # TODO Make all of this DRY
     def perform_scan(self, target: str, port_range: str, scan_type) -> list:
@@ -34,71 +35,86 @@ class Scanner(object):
         }
 
         if scan_type != "T" and scan_type != "U":
-            soc = self.__create_tcp_raw_socket()
+            soc = self.__create_raw_socket("TCP")
+        elif scan_type == "T":
+            soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        elif scan_type == "U":
+            soc = self.__create_raw_socket("UDP")
+        soc_icmp = self.__create_raw_socket("ICMP")
 
         for port in range(int(ports[0]), int(ports[1]) + 1):
-            return_list.append(scans[scan_type](self=self, target=target, port=port, soc=soc))
+            return_list.append(scans[scan_type](target, port, soc, soc_icmp))
 
         return return_list
 
-    def _tcp_scan(self, target: str, port) -> str:
+    def _tcp_scan(self, target: str, port, soc: socket, *args) -> str:
         """Performs a TCP scan on a given target and port"""
 
-        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         status = soc.connect_ex((target, port))
         if status == 0:
             soc.shutdown(socket.SHUT_RDWR)
             return "Open - " + str(port)
 
-    def _syn_scan(self, target: str, port, soc) -> str:
+
+    # TODO Make a function that will handle sending and reciving packets, threading
+    def _syn_scan(self, target: str, port, soc: socket, soc_icmp: socket) -> str:
         """Performs a SYN scan on a given target and port"""
 
         soc.settimeout(2.99)
+        soc_icmp.settimeout(2.99)
         packet = packetgenerator.generate_tcp_packet(port, syn=1)
         soc.sendto(packet, (target, port))
-        try:
-            rec_packet = soc.recv(65535)
-        except socket.timeout:
-            return "Filtered " + str(port)
 
-        header = packetgenerator.unpack_tcp_packet(rec_packet[20:40])
+        tcp_result = self.__await_response(soc)
+        icmp_result = self.__await_response(soc_icmp)
+
+        if tcp_result == False:
+            for i in range(3):
+                soc.sendto(packet, (target, port))
+                tcp_res = self.__await_response(soc)
+                if tcp_res != False:
+                    break
+                else:
+                    return "Filtered " + str(port)
+
+        header = packetgenerator.unpack_tcp_packet(tcp_result[20:40])
         tcp_flags = self.__check_tcp_flags(bin(header[5])[2:])
 
         if TcpFlags.SYN in tcp_flags and TcpFlags.ACK in tcp_flags and len(tcp_flags) == 2:
             return "Open " + str(port)
-
-        if TcpFlags.SYN in tcp_flags and len(tcp_flags) == 1:
+        elif TcpFlags.SYN in tcp_flags and len(tcp_flags) == 1:
             return "Open " + str(port)
+        elif TcpFlags.RST in tcp_flags and len(tcp_flags) == 1:
+            return "Closed " + str(port)
 
-    def _udp_scan(self, target: str, port) -> str:
+        if icmp_result != False:
+            icmp_header = packetgenerator.unpack_icmp_packet(icmp_result[20:28])
+            if icmp_header[0] == 3:
+                return  "Filtered " + str(port)
+
+
+    def _udp_scan(self, target: str, port, soc: socket, soc_icmp: socket) -> str:
         """Performs a UDP scan on a given target and port"""
 
-        try:
-            soc = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
-            soc_recv = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
-        except OSError:
-            print("You need administrator rights to run this scan")
-            raise
-        soc_recv.settimeout(10.99)
+        soc_icmp.settimeout(10.99)
+        soc.settimeout(10.99)
 
         packet = packetgenerator.generate_udp_packet(port)
         soc.sendto(packet, (target, port))
 
-        try:
-            rec_packet = soc_recv.recv(1024)
-        except socket.timeout:
-            soc.sendto(packet, (target, port))
-            try:
-                rec_packet = soc_recv.recv(1024)
-            except socket.timeout:
-                return "Open | filtered" + str(port)
+        icmp_result = self.__await_response(soc_icmp)
 
-        icmp_header = packetgenerator.unpack_icmp_packet(rec_packet[20:28])
+        if icmp_result != False:
+            icmp_header = packetgenerator.unpack_icmp_packet(icmp_result[20:28])
 
-        if icmp_header[0] == 3 and icmp_header[1] != 3:
-            return "Filtered " + str(port)
+            if icmp_header[0] == 3 and icmp_header[1] == 3:
+                return "Closed " + str(port)
+            elif icmp_header[0] == 3 and icmp_header[1] != 3:
+                return "Filtered " + str(port)
+        else:
+            return "Open | filtered " + str(port)
 
-    def _ack_scan(self, target: str, port, soc) -> str:
+    def _ack_scan(self, target: str, port, soc: socket, soc_icmp: socket) -> str:
         """Performs an ACK scan on a given target and port"""
 
         packet = packetgenerator.generate_tcp_packet(port, ack=1)
@@ -114,7 +130,7 @@ class Scanner(object):
         if TcpFlags.RST in tcp_flags:
             return "Unfiltered " + str(port)
 
-    def _fin_scan(self, target: str, port, soc) -> str:
+    def _fin_scan(self, target: str, port, soc: socket, soc_icmp: socket) -> str:
         """Performs an FIN scan on a given target and port"""
 
         packet = packetgenerator.generate_tcp_packet(port, fin=1)
@@ -124,7 +140,7 @@ class Scanner(object):
         except socket.timeout:
             return "Open|filtered " + str(port)
 
-    def _xmas_scan(self, target: str, port, soc) -> str:
+    def _xmas_scan(self, target: str, port, soc: socket, soc_icmp: socket) -> str:
         """Performs an Xmas scan on a given target and port"""
 
         packet = packetgenerator.generate_tcp_packet(port, fin=1, urg=1, psh=1)
@@ -134,7 +150,7 @@ class Scanner(object):
         except socket.timeout:
             return "Open|filtered " + str(port)
 
-    def _null_scan(self, target: str, port: str, soc) -> str:
+    def _null_scan(self, target: str, port, soc: socket, soc_icmp: socket) -> str:
         """Performs an null scan on a given target and port"""
 
         packet = packetgenerator.generate_tcp_packet(port)
@@ -143,6 +159,15 @@ class Scanner(object):
             rec_packet = soc.recv(65535)
         except socket.timeout:
             return "Open|filtered " + str(port)
+
+    def __await_response(self, soc: socket):
+        """Returns False if socket timed out, otherwise returns incoming packet"""
+
+        try:
+            recv_packet = soc.recv(65535)
+        except socket.timeout:
+            return False
+        return recv_packet
 
     @staticmethod
     def __check_tcp_flags(flags_bin):
@@ -156,10 +181,18 @@ class Scanner(object):
         return return_list
 
     @staticmethod
-    def __create_tcp_raw_socket():
-        try:
-            soc = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
-        except OSError:
+    def __create_raw_socket(soc_type: str):
+        if os.getuid() != 0:
             print("You need administrator rights to run this scan")
-            raise
+            raise OSError
+
+        if soc_type == "TCP":
+            soc = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
+        elif soc_type == "UDP":
+            soc = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
+        elif soc_type == "ICMP":
+            soc = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
+        else:
+            return
+
         return soc

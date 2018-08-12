@@ -1,8 +1,6 @@
 from struct import pack, unpack
-from uuid import getnode as get_mac
 from socket import gethostbyname, gethostname
-import ipaddress
-import binascii
+
 
 
 def generate_tcp_packet(dst_port, hdr_len=5, fin=0, syn=0, rst=0, psh=0,
@@ -65,6 +63,7 @@ def generate_spoofed_eth_arp_packet(eth_src_mac, dst_ip: str, htype=0x0001, ptyp
                   )
     return header
 
+
 def unpack_tcp_packet(packet):
     header = unpack("!HHLLBBHHH", packet)
     return header
@@ -74,10 +73,12 @@ def unpack_icmp_packet(packet):
     header = unpack("!BBHL", packet)
     return header
 
+
 # TODO make this accept all kinds of raw packets, varying length
 def unpack_eth_arp_packet(packet):
     header = unpack("!6B6B2B18BHHBBH6B4B6B4B", packet)
     return header
+
 
 def _calculate_checksum():
     return
