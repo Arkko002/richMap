@@ -2,7 +2,6 @@ import argparse
 import portscanner
 import netmaper
 import sys
-import richgui
 
 def parse_args(argv=sys.argv[1:]):
     """Parses the command line arguments"""
@@ -13,9 +12,9 @@ def parse_args(argv=sys.argv[1:]):
     parser.add_argument("-t", "--target", type=str, action="store",
                         dest="target", metavar="HST", help="IP of the target machine.")
     parser.add_argument("-s", "--scan", type=str, action="store",
-                        dest="scan_type", metavar="SCN", help="The type of scan to be used.")
+                        dest="scan_type", metavar="SCN", help="The type of port scan to be used.")
     parser.add_argument("-m", "--map", action="store",
-                        dest="map", help="The type of scan to be used")
+                        dest="map", help="The type of network scan to be used")
     parser.add_argument("-i", "--interface", help="Interface to be checked with ARP scan",
                         dest="net_int", action="store")
     return parser.parse_args(argv)

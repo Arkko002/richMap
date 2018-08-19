@@ -64,21 +64,28 @@ def generate_spoofed_eth_arp_packet(eth_src_mac, dst_ip: str, htype=0x0001, ptyp
     return header
 
 
-def unpack_tcp_packet(packet):
-    header = unpack("!HHLLBBHHH", packet)
+def unpack_tcp_header(packet):
+    packed_header = packet[20:40]
+    header = unpack("!HHLLBBHHH", packed_header)
     return header
 
 
-def unpack_icmp_packet(packet):
-    header = unpack("!BBHL", packet)
+def unpack_icmp_header(packet):
+    packed_header = packet[20:28]
+    header = unpack("!BBHL", packed_header)
     return header
 
 
 # TODO make this accept all kinds of raw packets, varying length
-def unpack_eth_arp_packet(packet):
-    header = unpack("!6B6B2B18BHHBBH6B4B6B4B", packet)
+def unpack_arp_header(packet):
+    packed_header = packet[14:42]
+    header = unpack("!HHBBH6B4B6B4B", packed_header)
     return header
 
+def unpack_eth_header(packet):
+    packed_header = packet[0:14]
+    header = unpack("6B6B2B", packed_header)
+    return header
 
 def _calculate_checksum():
     return
