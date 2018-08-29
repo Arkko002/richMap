@@ -1,6 +1,7 @@
 import socket
-import packetgenerator
+from packetgenerator import PacketGenerator
 import os
+import re
 from enum import Enum
 
 
@@ -19,7 +20,7 @@ class PortScanner(object):
 
     # TODO Make all of this DRY
     # TODO Threading
-    def perform_scan(self, target: str, scan_type, port_range: str = None) -> list:
+    def perform_scan(self, target: str, scan_type, port_range: str = None):
         """Base function to be called when performing scan"""
 
         return_list = []
@@ -39,6 +40,9 @@ class PortScanner(object):
             "W": self._window_scan
         }
 
+        if scan_type not in scans:
+            return "Wrong scan type specified"
+
         if scan_type != "T" and scan_type != "U":
             soc = self.__create_raw_socket("TCP")
         elif scan_type == "T":
@@ -51,9 +55,17 @@ class PortScanner(object):
 
         soc_icmp = self.__create_raw_socket("ICMP")
 
-        for port in range(int(ports[0]), int(ports[1]) + 1):
-            return_list.append(scans[scan_type](target, port, soc, soc_icmp))
+        r = re.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]"
+                       "|25[0-5])$")
 
+        if r.match(target):
+            for port in range(int(ports[0]), int(ports[1]) + 1):
+                return_list.append(scans[scan_type](target, port, soc, soc_icmp))
+        else:
+            return "The given IP is not in the correct format"
+
+        soc.close()
+        soc_icmp.close()
         return return_list
 
     def _tcp_scan(self, target: str, port, soc: socket, *args) -> str:
@@ -71,7 +83,7 @@ class PortScanner(object):
 
         soc.settimeout(2.99)
         soc_icmp.settimeout(2.99)
-        packet = packetgenerator.generate_tcp_packet(port, syn=1)
+        packet = PacketGenerator.generate_tcp_packet(port, syn=1)
         soc.sendto(packet, (target, port))
 
         tcp_result = self.__await_response(soc)
@@ -82,7 +94,7 @@ class PortScanner(object):
             if tcp_result is None and icmp_result is None:
                 return "Filtered " + str(port)
 
-        header = packetgenerator.unpack_tcp_header(tcp_result)
+        header = PacketGenerator.unpack_tcp_header(tcp_result)
         tcp_flags = self.__check_tcp_flags(bin(header[5])[2:])
 
         if TcpFlags.SYN in tcp_flags and TcpFlags.ACK in tcp_flags and len(tcp_flags) == 2:
@@ -93,7 +105,7 @@ class PortScanner(object):
             return "Closed " + str(port)
 
         if icmp_result is not None:
-            icmp_header = packetgenerator.unpack_icmp_header(icmp_result)
+            icmp_header = PacketGenerator.unpack_icmp_header(icmp_result)
             if icmp_header[0] == 3:
                 return "Filtered " + str(port)
 
@@ -104,13 +116,13 @@ class PortScanner(object):
         soc_icmp.settimeout(10.99)
         soc.settimeout(10.99)
 
-        packet = packetgenerator.generate_udp_packet(port)
+        packet = PacketGenerator.generate_udp_packet(port)
         soc.sendto(packet, (target, port))
 
         icmp_result = self.__await_response(soc_icmp)
 
         if icmp_result is not None:
-            icmp_header = packetgenerator.unpack_icmp_header(icmp_result)
+            icmp_header = PacketGenerator.unpack_icmp_header(icmp_result)
 
             if icmp_header[0] == 3 and icmp_header[1] == 3:
                 return "Closed " + str(port)
@@ -122,7 +134,7 @@ class PortScanner(object):
     def _ack_scan(self, target: str, port, soc: socket, soc_icmp: socket) -> str:
         """Performs an ACK scan on a given target and port"""
 
-        packet = packetgenerator.generate_tcp_packet(port, ack=1)
+        packet = PacketGenerator.generate_tcp_packet(port, ack=1)
         soc.sendto(packet, (target, port))
 
         tcp_result = self.__await_response(soc)
@@ -134,14 +146,14 @@ class PortScanner(object):
                 return "Filtered " + str(port)
 
         if tcp_result is not None:
-            tcp_header = packetgenerator.unpack_tcp_header(tcp_result)
+            tcp_header = PacketGenerator.unpack_tcp_header(tcp_result)
             tcp_flags = self.__check_tcp_flags(bin(tcp_header[5])[2:])
 
             if TcpFlags.RST in tcp_flags:
                 return "Unfiltered " + str(port)
 
         if icmp_result is not None:
-            icmp_header = packetgenerator.unpack_icmp_header(icmp_result)
+            icmp_header = PacketGenerator.unpack_icmp_header(icmp_result)
 
             if icmp_header[0] == 3:
                 return "Filtered " + str(port)
@@ -150,11 +162,11 @@ class PortScanner(object):
         """Performs either FIN, Xmas, or null scan on a given target and port"""
 
         if special_scan_type == "F":
-            packet = packetgenerator.generate_tcp_packet(port, fin=1)
+            packet = PacketGenerator.generate_tcp_packet(port, fin=1)
         elif special_scan_type == "X":
-            packet = packetgenerator.generate_tcp_packet(port, fin=1, urg=1, psh=1)
+            packet = PacketGenerator.generate_tcp_packet(port, fin=1, urg=1, psh=1)
         elif special_scan_type == "N":
-            packet = packetgenerator.generate_tcp_packet(port)
+            packet = PacketGenerator.generate_tcp_packet(port)
 
         soc.sendto(packet, (target, port))
 
@@ -167,22 +179,22 @@ class PortScanner(object):
                 return "Open | filtered " + str(port)
 
         if tcp_result is not None:
-            tcp_header = packetgenerator.unpack_tcp_header(tcp_result)
+            tcp_header = PacketGenerator.unpack_tcp_header(tcp_result)
             tcp_flags = self.__check_tcp_flags(bin(tcp_header[5])[2:])
 
             if TcpFlags.RST in tcp_flags:
                 return "Closed " + str(port)
 
         if icmp_result is not None:
-            icmp_header = packetgenerator.unpack_icmp_header(icmp_result)
+            icmp_header = PacketGenerator.unpack_icmp_header(icmp_result)
 
             if icmp_header[0] == 3:
                 return "Filtered " + str(port)
 
-    def _window_scan(self, target: str, port, soc: socket, soc_icmp: socket):
+    def _window_scan(self, target: str, port, soc: socket, soc_icmp: socket) -> str:
         """Performs window scan on a given target and port"""
 
-        packet = packetgenerator.generate_tcp_packet(port, ack=1)
+        packet = PacketGenerator.generate_tcp_packet(port, ack=1)
         soc.sendto(packet, (target, port))
 
         tcp_result = self.__await_response(soc)
@@ -194,7 +206,7 @@ class PortScanner(object):
                 return "Filtered " + str(port)
 
         if tcp_result is not None:
-            tcp_header = packetgenerator.unpack_tcp_header(tcp_result)
+            tcp_header = PacketGenerator.unpack_tcp_header(tcp_result)
             tcp_flags = self.__check_tcp_flags(bin(tcp_header[5])[2:])
 
             if TcpFlags.RST in tcp_flags:
@@ -204,15 +216,15 @@ class PortScanner(object):
                     return "Closed " + str(port)
 
         if icmp_result is not None:
-            icmp_header = packetgenerator.unpack_icmp_header(icmp_result)
+            icmp_header = PacketGenerator.unpack_icmp_header(icmp_result)
 
             if icmp_header[0] == 3:
                 return "Filtered " + str(port)
 
-    def _maimon_scan(self, target: str, port, soc: socket, soc_icmp: socket):
+    def _maimon_scan(self, target: str, port, soc: socket, soc_icmp: socket) -> str:
         """Performs Maimon's scan on a given target and port"""
 
-        packet = packetgenerator.generate_tcp_packet(port, fin=1, ack=1)
+        packet = PacketGenerator.generate_tcp_packet(port, fin=1, ack=1)
         soc.sendto(packet, (target, port))
 
         tcp_result = self.__await_response(soc)
@@ -224,14 +236,14 @@ class PortScanner(object):
                 return "Open " + str(port)
 
         if tcp_result is not None:
-            tcp_header = packetgenerator.unpack_tcp_header(tcp_result)
+            tcp_header = PacketGenerator.unpack_tcp_header(tcp_result)
             tcp_flags = self.__check_tcp_flags(bin(tcp_header[5])[2:])
 
             if TcpFlags.RST in tcp_flags:
                 return "Closed " + str(port)
 
         if icmp_result is not None:
-            icmp_header = packetgenerator.unpack_icmp_header(icmp_result)
+            icmp_header = PacketGenerator.unpack_icmp_header(icmp_result)
 
             if icmp_header[0] == 3:
                 return "Filtered " + str(port)
@@ -275,8 +287,7 @@ class PortScanner(object):
     @staticmethod
     def __create_raw_socket(soc_type: str):
         if os.getuid() != 0:
-            print("You need administrator rights to run this scan")
-            raise OSError
+            return "You need administrator rights to run this scan"
 
         if soc_type == "TCP":
             soc = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)

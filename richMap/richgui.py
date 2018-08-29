@@ -17,7 +17,7 @@ class RichGUI(ttk.Frame):
         self.hosts_frame = HostsFrame(self)
         self.inputs_frame.grid(column=0, row=0)
         self.hosts_frame.grid(column=0, row=1, sticky=(W, S, N))
-        self.outputs_frame.grid(column=0, row=1, sticky=(E))
+        self.outputs_frame.grid(column=0, row=1, sticky=(E,))
 
         self.port_scanner = portscanner.PortScanner()
         self.net_maper = netmaper.Netmaper()
@@ -25,7 +25,7 @@ class RichGUI(ttk.Frame):
     def perform_scan(self, target: str, commands: str):
         commands_list = commands.split(" ")
 
-        range = None
+        range_str = None
         net_interface = None
 
         for command in commands_list:
@@ -34,7 +34,7 @@ class RichGUI(ttk.Frame):
             elif command.startswith("-s"):
                 scan_type = command.replace("-s", "")
             elif command.startswith("-r"):
-                range = command.replace("-r", "")
+                range_str = command.replace("-r", "")
             elif command.startswith("-i"):
                 net_interface = command.replace("-i", "")
 
@@ -42,7 +42,7 @@ class RichGUI(ttk.Frame):
             self.outputs_frame.print_scan_result(self.net_maper.map_network(target, scan_type, net_interface))
 
         if "-s" in commands:
-            self.outputs_frame.print_scan_result(self.port_scanner.perform_scan(target, scan_type, range))
+            self.outputs_frame.print_scan_result(self.port_scanner.perform_scan(target, scan_type, range_str))
 
         self.hosts_frame.add_host(target)
 
@@ -111,16 +111,16 @@ class OutputsFrame(ttk.Frame):
         self.output_textbox = Text(self)
         self.output_textbox.grid(column=0, row=0)
 
-    def print_scan_result(self, list):
+    def print_scan_result(self, results):
         self.output_textbox.delete("1.0", END)
         self.output_textbox.insert(END, "Output of " + self.parent.inputs_frame.scan_type_combobox.get() + " on " +
                                    self.parent.inputs_frame.target_entry.get() + "\n")
 
         if self.parent.inputs_frame.verbosity_combobox.get() == "High":
-            for item in list:
+            for item in results:
                 self.output_textbox.insert(END, item + "\n")
         else:
-            for item in list:
+            for item in results:
                 if "Open" in item or "Filtered" in item or "Unfiltered" in item or "Host Up" in item:
                     self.output_textbox.insert(END, item + "\n")
 
