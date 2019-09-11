@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-import portscanner
-import netmaper
+from portscanner import PortScanner
+from netmaper import Netmaper
 
 
 class RichGUI(ttk.Frame):
@@ -19,14 +19,15 @@ class RichGUI(ttk.Frame):
         self.hosts_frame.grid(column=0, row=1, sticky=(W, S, N))
         self.outputs_frame.grid(column=0, row=1, sticky=(E,))
 
-        self.port_scanner = portscanner.PortScanner()
-        self.net_maper = netmaper.Netmaper()
-
     def perform_scan(self, target: str, commands: str):
         commands_list = commands.split(" ")
 
         range_str = None
         net_interface = None
+
+        if "-m" or "-s" not in commands_list:
+            self.outputs_frame.print_error("You need to select the scan/map type")
+            return
 
         for command in commands_list:
             if command.startswith("-m"):
@@ -39,10 +40,12 @@ class RichGUI(ttk.Frame):
                 net_interface = command.replace("-i", "")
 
         if "-m" in commands:
-            self.outputs_frame.print_scan_result(self.net_maper.map_network(target, scan_type, net_interface))
+            mapper = Netmaper(network_ip=target, scan_type=scan_type, net_interface=net_interface)
+            self.outputs_frame.print_scan_result(mapper.map_network())
 
         if "-s" in commands:
-            self.outputs_frame.print_scan_result(self.port_scanner.perform_scan(target, scan_type, range_str))
+            scan = PortScanner(target=target, scan_type=scan_type, port_range=range_str)
+            self.outputs_frame.print_scan_result(scan.perform_scan())
 
         self.hosts_frame.add_host(target)
 
@@ -58,9 +61,10 @@ class InputsFrame(ttk.Frame):
         self.command_entry = Entry(self)
         self.command_label = Label(self, text="Command:")
 
-        self.scan_type_combobox = ttk.Combobox(self, values=["Ping Scan","ARP Scan", "ARP Stealth Scan", "TCP Scan", "SYN Scan",
-                                               "UDP Scan", "ACK Scan", "Xmas Scan", "Null Scan", "FIN Scan",
-                                               "Window Scan", "Maimon's Scan"])
+        self.scan_type_combobox = ttk.Combobox(self, values=["Ping Scan", "ARP Scan", "ARP Stealth Scan", "TCP Scan",
+                                                             "SYN Scan", "UDP Scan", "ACK Scan", "Xmas Scan",
+                                                             "Null Scan", "FIN Scan", "Maimon's Scan", "Window Scan", ])
+
 
         self.scan_type_combobox.current(0)
         self.scan_type_combobox.bind("<<ComboboxSelected>>", self.add_scan_to_cmd_entry)
@@ -123,6 +127,10 @@ class OutputsFrame(ttk.Frame):
             for item in results:
                 if "Open" in item or "Filtered" in item or "Unfiltered" in item or "Host Up" in item:
                     self.output_textbox.insert(END, item + "\n")
+
+    def print_error(self, error):
+        self.output_textbox.delete("1.0", END)
+        self.output_textbox.insert(END, error)
 
 
 class HostsFrame(ttk.Frame):

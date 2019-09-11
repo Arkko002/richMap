@@ -1,6 +1,6 @@
 import argparse
-import portscanner
-import netmaper
+from portscanner import PortScanner
+from netmaper import Netmaper
 import sys
 
 
@@ -8,11 +8,10 @@ class CLIController(object):
 
     def __init__(self):
         self.arguments = self.__parse_args()
-        self.scan = portscanner.PortScanner()
-        self.map = netmaper.Netmaper()
         self.view = CLIView(self)
 
-    def __parse_args(self, argv=sys.argv[1:]):
+    @staticmethod
+    def __parse_args(argv=sys.argv[1:]):
         """Parses the command line arguments"""
 
         parser = argparse.ArgumentParser()
@@ -35,13 +34,17 @@ class CLIController(object):
         """Sends the scan request to Model classes and delivers results to View class"""
 
         if self.arguments.scan_type is not None:
-            result = self.scan.perform_scan(target=self.arguments.target, port_range=self.arguments.range,
-                                            scan_type=self.arguments.scan_type)
+            scan = PortScanner(target=self.arguments.target, scan_type=self.arguments.scan_type,
+                               port_range=self.arguments.range)
+            result = scan.perform_scan()
+
             self.view.print_port_scan_results(result)
 
         elif self.arguments.map_type is not None:
-            result = self.map.map_network(network_ip=self.arguments.target, scan_type=self.arguments.map_type,
-                                          net_interface=self.arguments.net_int)
+            mapper = Netmaper(network_ip=self.arguments.target, scan_type=self.arguments.map_type,
+                              net_interface=self.arguments.net_int)
+            result = mapper.map_network()
+
             self.view.print_net_map_results(result)
 
         if self.arguments.scan_type is None and self.arguments.map_type is None:
@@ -117,4 +120,3 @@ class CLIView:
 if __name__ == "__main__":
     controller = CLIController()
     controller.get_scan_results()
-

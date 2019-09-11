@@ -2,7 +2,7 @@ from struct import pack, unpack
 from socket import gethostbyname, gethostname
 
 
-class PacketGenerator:
+class PacketGenerator(object):
 
     @staticmethod
     def generate_tcp_packet(dst_port, hdr_len=5, fin=0, syn=0, rst=0, psh=0,
