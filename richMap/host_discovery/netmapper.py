@@ -1,12 +1,12 @@
 import os
 import re
 import socket
-from packetgenerator import PacketGenerator
+from richMap.util.packetgenerator import PacketGenerator
 import random
 from time import sleep
 
 
-class Netmaper(object):
+class Netmapper(object):
     """Used to discover live hosts on the network"""
 
     def __init__(self, network_ip: str, scan_type: str, net_interface: str = None):
@@ -19,7 +19,8 @@ class Netmaper(object):
             self.net_interface = net_interface
 
         if "A" in scan_type:
-            self.soc = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(3))
+            self.soc = socket.socket(
+                socket.AF_PACKET, socket.SOCK_RAW, socket.htons(3))
 
             if scan_type == "As":
                 spoofed_mac_a = random.randrange(1, 255)
@@ -64,9 +65,11 @@ class Netmaper(object):
 
         if r.match(self.network_ip):
             for ip in range(1, 256):
-                scan_result = scans[self.scan_type](self.network_ip[:index + 1] + str(ip))
+                scan_result = scans[self.scan_type](
+                    self.network_ip[:index + 1] + str(ip))
                 if scan_result is not None:
-                    return_list.append(self.network_ip[:index + 1] + str(ip) + " " + scan_result + " Host Up")
+                    return_list.append(
+                        self.network_ip[:index + 1] + str(ip) + " " + scan_result + " Host Up")
         else:
             return "The given IP is not in the correct format"
 
@@ -100,7 +103,8 @@ class Netmaper(object):
                 for i in range(5, 11):
                     if len(str(rec_arp_header[i])) == 1:
                         rec_mac_adr = rec_mac_adr + "0"
-                    rec_mac_adr = rec_mac_adr + str(hex(rec_arp_header[i])).replace("0x", "") + ":"
+                    rec_mac_adr = rec_mac_adr + \
+                        str(hex(rec_arp_header[i])).replace("0x", "") + ":"
                 return rec_mac_adr
         else:
             return None
@@ -108,7 +112,8 @@ class Netmaper(object):
     def _arp_stealth_scan(self, ip: str):
         """Performs stealth ARP scan on the target network"""
 
-        packet = PacketGenerator.generate_spoofed_eth_arp_packet(dst_ip=ip, eth_src_mac=self.spoofed_src_mac)
+        packet = PacketGenerator.generate_spoofed_eth_arp_packet(
+            dst_ip=ip, eth_src_mac=self.spoofed_src_mac)
         time_to_sleep = random.randrange(120, 720)
 
         sleep(time_to_sleep)

@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-from portscanner import PortScanner
-from netmaper import Netmaper
+from .port_scanning.portscanner import PortScanner
+from .host_discovery.netmapper import Netmapper
 
 
 class RichGUI(ttk.Frame):
@@ -26,7 +26,8 @@ class RichGUI(ttk.Frame):
         net_interface = None
 
         if "-m" or "-s" not in commands_list:
-            self.outputs_frame.print_error("You need to select the scan/map type")
+            self.outputs_frame.print_error(
+                "You need to select the scan/map type")
             return
 
         for command in commands_list:
@@ -40,11 +41,13 @@ class RichGUI(ttk.Frame):
                 net_interface = command.replace("-i", "")
 
         if "-m" in commands:
-            mapper = Netmaper(network_ip=target, scan_type=scan_type, net_interface=net_interface)
+            mapper = Netmapper(
+                network_ip=target, scan_type=scan_type, net_interface=net_interface)
             self.outputs_frame.print_scan_result(mapper.map_network())
 
         if "-s" in commands:
-            scan = PortScanner(target=target, scan_type=scan_type, port_range=range_str)
+            scan = PortScanner(
+                target=target, scan_type=scan_type, port_range=range_str)
             self.outputs_frame.print_scan_result(scan.perform_scan())
 
         self.hosts_frame.add_host(target)
@@ -65,9 +68,9 @@ class InputsFrame(ttk.Frame):
                                                              "SYN Scan", "UDP Scan", "ACK Scan", "Xmas Scan",
                                                              "Null Scan", "FIN Scan", "Maimon's Scan", "Window Scan", ])
 
-
         self.scan_type_combobox.current(0)
-        self.scan_type_combobox.bind("<<ComboboxSelected>>", self.add_scan_to_cmd_entry)
+        self.scan_type_combobox.bind(
+            "<<ComboboxSelected>>", self.add_scan_to_cmd_entry)
         self.scan_type_label = Label(self, text="Scan Type:")
 
         self.scan_button = Button(self, text="Scan", command=lambda: self.parent.perform_scan(self.target_entry.get(),
@@ -82,7 +85,8 @@ class InputsFrame(ttk.Frame):
         self.scan_type_label.grid(column=2, row=0, padx=5)
         self.scan_type_combobox.grid(column=3, row=0)
         self.command_label.grid(column=0, row=1)
-        self.command_entry.grid(column=1, row=1, columnspan=3, sticky=(E, W), pady=10)
+        self.command_entry.grid(
+            column=1, row=1, columnspan=3, sticky=(E, W), pady=10)
         self.scan_button.grid(column=4, row=0, padx=10)
         self.verbosity_label.grid(column=4, row=1)
         self.verbosity_combobox.grid(column=5, row=1)
@@ -105,12 +109,14 @@ class InputsFrame(ttk.Frame):
         }
 
         self.command_entry.delete(0, END)
-        self.command_entry.insert(END, scan_types[self.scan_type_combobox.get()])
+        self.command_entry.insert(
+            END, scan_types[self.scan_type_combobox.get()])
 
 
 class OutputsFrame(ttk.Frame):
     def __init__(self, parent, **kwargs):
-        ttk.Frame.__init__(self, parent, borderwidth=2, relief="sunken", **kwargs)
+        ttk.Frame.__init__(self, parent, borderwidth=2,
+                           relief="sunken", **kwargs)
         self.parent = parent
         self.output_textbox = Text(self)
         self.output_textbox.grid(column=0, row=0)
@@ -149,7 +155,8 @@ class HostsFrame(ttk.Frame):
 
     def set_host(self, *args):
         self.parent.inputs_frame.target_entry.delete(0, END)
-        self.parent.inputs_frame.target_entry.insert(0, self.host_listbox.get(self.host_listbox.curselection()[0]))
+        self.parent.inputs_frame.target_entry.insert(
+            0, self.host_listbox.get(self.host_listbox.curselection()[0]))
 
 
 if __name__ == "__main__":

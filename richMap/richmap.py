@@ -1,6 +1,6 @@
 import argparse
-from portscanner import PortScanner
-from netmaper import Netmaper
+from .port_scanning.portscanner import PortScanner
+from .host_discovery.netmapper import Netmapper
 import sys
 
 
@@ -41,8 +41,8 @@ class CLIController(object):
             self.view.print_port_scan_results(result)
 
         elif self.arguments.map_type is not None:
-            mapper = Netmaper(network_ip=self.arguments.target, scan_type=self.arguments.map_type,
-                              net_interface=self.arguments.net_int)
+            mapper = Netmapper(network_ip=self.arguments.target, scan_type=self.arguments.map_type,
+                               net_interface=self.arguments.net_int)
             result = mapper.map_network()
 
             self.view.print_net_map_results(result)
@@ -92,7 +92,8 @@ class CLIView:
         map_type = self.map_types[self.parent.arguments.map]
         target = self.parent.arguments.target
         interface = self.parent.arguments.net_int
-        info = "Performing {0} on {1} ({2})".format(map_type, target, interface)
+        info = "Performing {0} on {1} ({2})".format(
+            map_type, target, interface)
 
         if not results:
             print("No hosts returned as online")
