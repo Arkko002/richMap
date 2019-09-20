@@ -18,26 +18,7 @@ class Netmapper(object):
         else:
             self.net_interface = net_interface
 
-        if "A" in scan_type:
-            self.soc = socket.socket(
-                socket.AF_PACKET, socket.SOCK_RAW, socket.htons(3))
-
-            if scan_type == "As":
-                spoofed_mac_a = random.randrange(1, 255)
-                spoofed_mac_b = random.randrange(1, 255)
-                spoofed_mac_c = random.randrange(1, 255)
-                spoofed_mac_d = random.randrange(1, 255)
-                spoofed_mac_e = random.randrange(1, 255)
-                spoofed_mac_f = random.randrange(1, 255)
-
-                self.spoofed_src_mac = [
-                    spoofed_mac_a,
-                    spoofed_mac_b,
-                    spoofed_mac_c,
-                    spoofed_mac_d,
-                    spoofed_mac_e,
-                    spoofed_mac_f
-                ]
+        self.soc = self.__create_scan_socket()
 
     def __del__(self):
         self.soc.close()
@@ -134,3 +115,10 @@ class Netmapper(object):
     def __get_default_interface():
         interfaces = os.listdir("/sys/class/net")
         return interfaces[0]
+
+    def __create_scan_socket(self, scan_type: str):
+        if "A" in scan_type:
+            self.soc = 
+
+            if scan_type == "As":
+            
