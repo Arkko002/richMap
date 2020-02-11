@@ -1,5 +1,6 @@
 import socket
-from packetgenerator import PacketGenerator
+from richMap.util.packet_generator import PacketGenerator
+from richMap.scan_types import ScanTypes
 import os
 import re
 from enum import Enum
@@ -16,45 +17,47 @@ class TcpFlags(Enum):
     FIN = 7
 
 
+class SocketType(Enum):
+    Error = 0
+    UDP = 1
+    TCP = 2
+    ICMP = 3
+
+
 class PortScanner(object):
-    def __init__(self, target: str, scan_type, port_range: str = None):
+    def __init__(self, target: str, scan_type: ScanTypes, port_range):
         self.target = target
         self.scan_type = scan_type
+        self.port_range = port_range.split("-")
 
-        if port_range is None:
-            self.port_range = "1-65535".split("-")
-        self.port_range = port_range
+        self.socket_scan_type = {
+            ScanTypes.T: socket.socket(socket.AF_INET, socket.SOCK_STREAM),
+            ScanTypes.U: self.__create_raw_socket(SocketType.UDP),
+        }
 
-        self.soc_icmp = self.__create_raw_socket("ICMP")
+        if scan_type == ScanTypes.S or scan_type == ScanTypes.U:
+            self.soc_icmp = self.__create_raw_socket(SocketType.ICMP)
 
-        if scan_type != "T" and scan_type != "U":
-            self.soc = self.__create_raw_socket("TCP")
-        elif scan_type == "T":
-            self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        elif scan_type == "U":
-            self.soc = self.__create_raw_socket("UDP")
-        elif scan_type == "F" or scan_type == "X" or scan_type == "N":
-            self.special_scan_type = scan_type
+        if scan_type not in self.socket_scan_type:
+            self.soc = self.__create_raw_socket(SocketType.TCP)
 
     def __del__(self):
         self.soc.close()
         self.soc_icmp.close()
 
-    # TODO Make all of this DRY
-    # TODO Threading
     def perform_scan(self):
         """Base function to be called when performing scan"""
 
         scans = {
-            "T": self._tcp_scan,
-            "S": self._syn_scan,
-            "U": self._udp_scan,
-            "A": self._ack_scan,
-            "F": self._fin_xmas_null_scan,
-            "X": self._fin_xmas_null_scan,
-            "N": self._fin_xmas_null_scan,
-            "M": self._maimon_scan,
-            "W": self._window_scan
+            ScanTypes.T: self._tcp_scan,
+            ScanTypes.S: self._syn_scan,
+            ScanTypes.U: self._udp_scan,
+            ScanTypes.A: self._ack_scan,
+            ScanTypes.F: self._fin_scan,
+            ScanTypes.X: self._xmas_scan,
+            ScanTypes.N: self._null_scan,
+            ScanTypes.M: self._maimon_scan,
+            ScanTypes.W: self._window_scan
         }
 
         if self.scan_type not in scans:
@@ -65,25 +68,25 @@ class PortScanner(object):
 
         return_list = []
 
-        if r.match(self.target):
-            for port in range(int(self.port_range[0]), int(self.port_range[1]) + 1):
-                return_list.append(scans[self.scan_type](self.target, port))
-        else:
+        if r.match(self.target) is False:
             return "The given IP is not in the correct format"
+
+        for port in range(int(self.port_range[0]), int(self.port_range[1]) + 1):
+            return_list.append(scans[self.scan_type](self.target, port))
 
         return return_list
 
-    def _tcp_scan(self, target: str, port) -> str:
+    def _tcp_scan(self, target: str, port) -> bool:
         """Performs a TCP scan on a given target and port"""
 
         status = self.soc.connect_ex((target, port))
         if status == 0:
             self.soc.shutdown(socket.SHUT_RDWR)
-            return "Open " + str(port)
+            return True
         else:
-            return "Closed " + str(port)
+            return False
 
-    def _syn_scan(self, target: str, port) -> str:
+    def _syn_scan(self, target: str, port) -> bool:
         """Performs a SYN scan on a given target and port"""
 
         self.soc.settimeout(2.99)
@@ -97,25 +100,25 @@ class PortScanner(object):
         if tcp_result is None and icmp_result is None:
             tcp_result, icmp_result = self.__resend_probe_packet(packet, target, port)
             if tcp_result is None and icmp_result is None:
-                return "Filtered " + str(port)
+                return False
 
         header = PacketGenerator.unpack_tcp_header(tcp_result)
         tcp_flags = self.__check_tcp_flags(bin(header[5])[2:])
 
         if TcpFlags.SYN in tcp_flags and TcpFlags.ACK in tcp_flags and len(tcp_flags) == 2:
-            return "Open " + str(port)
+            return True
         elif TcpFlags.SYN in tcp_flags and len(tcp_flags) == 1:
-            return "Open " + str(port)
+            return True
         elif TcpFlags.RST in tcp_flags and len(tcp_flags) == 1:
-            return "Closed " + str(port)
+            return False
 
         if icmp_result is not None:
             icmp_header = PacketGenerator.unpack_icmp_header(icmp_result)
             if icmp_header[0] == 3:
-                return "Filtered " + str(port)
+                return False
 
     # TODO
-    def _udp_scan(self, target: str, port) -> str:
+    def _udp_scan(self, target: str, port) -> bool:
         """Performs a UDP scan on a given target and port"""
 
         self.soc_icmp.settimeout(10.99)
@@ -136,7 +139,7 @@ class PortScanner(object):
         else:
             return "Open | Filtered " + str(port)
 
-    def _ack_scan(self, target: str, port) -> str:
+    def _ack_scan(self, target: str, port) -> bool:
         """Performs an ACK scan on a given target and port"""
 
         packet = PacketGenerator.generate_tcp_packet(port, ack=1)
@@ -163,18 +166,24 @@ class PortScanner(object):
             if icmp_header[0] == 3:
                 return "Filtered " + str(port)
 
-    def _fin_xmas_null_scan(self, target: str, port) -> str:
-        """Performs either FIN, Xmas, or null scan on a given target and port"""
+    def _fin_scan(self, target: str, port) -> bool:
+        packet = PacketGenerator.generate_tcp_packet(port, fin=1)
 
-        if self.special_scan_type == "F":
-            packet = PacketGenerator.generate_tcp_packet(port, fin=1)
-        elif self.special_scan_type == "X":
-            packet = PacketGenerator.generate_tcp_packet(port, fin=1, urg=1, psh=1)
-        elif self.special_scan_type == "N":
-            packet = PacketGenerator.generate_tcp_packet(port)
-        else:
-            return "The provided scan type doesn't exist"
+        return self._fin_xmas_null_scan(target, port, packet)
 
+    def _xmas_scan(self, target: str, port) -> bool:
+        packet = PacketGenerator.generate_tcp_packet(port, fin=1, urg=1, psh=1)
+
+        return self._fin_xmas_null_scan(target, port, packet)
+
+    def _null_scan(self, target: str, port) -> bool:
+        packet = PacketGenerator.generate_tcp_packet(port)
+
+        return self._fin_xmas_null_scan(target, port, packet)
+
+    def _fin_xmas_null_scan(self, target: str, port, packet) -> bool:
+        """Code shared by FIN, XMAS, NULL scan. Should only be called
+        from within a function that specifies the scan type / packet flags"""
         self.soc.sendto(packet, (target, port))
 
         tcp_result = self.__await_response()
@@ -198,7 +207,7 @@ class PortScanner(object):
             if icmp_header[0] == 3:
                 return "Filtered " + str(port)
 
-    def _window_scan(self, target: str, port) -> str:
+    def _window_scan(self, target: str, port) -> bool:
         """Performs window scan on a given target and port"""
 
         packet = PacketGenerator.generate_tcp_packet(port, ack=1)
@@ -228,7 +237,7 @@ class PortScanner(object):
             if icmp_header[0] == 3:
                 return "Filtered " + str(port)
 
-    def _maimon_scan(self, target: str, port) -> str:
+    def _maimon_scan(self, target: str, port) -> bool:
         """Performs Maimon's scan on a given target and port"""
 
         packet = PacketGenerator.generate_tcp_packet(port, fin=1, ack=1)
@@ -290,18 +299,26 @@ class PortScanner(object):
                 return_list.append(TcpFlags(i))
         return return_list
 
-    @staticmethod
-    def __create_raw_socket(soc_type: str):
+    def __create_raw_socket(self, soc_type: SocketType):
         if os.getuid() != 0:
             return "You need administrator rights to run this scan"
 
-        if soc_type == "TCP":
-            soc = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
-        elif soc_type == "UDP":
-            soc = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
-        elif soc_type == "ICMP":
-            soc = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)
-        else:
-            return
+        socket_switcher = {
+            SocketType.TCP: self.__get_tcp_raw_socket(),
+            SocketType.UDP: self.__get_udp_raw_socket(),
+            SocketType.ICMP: self.__get_icmp_raw_socket()
+        }
 
-        return soc
+        return socket_switcher[soc_type]
+
+    @staticmethod
+    def __get_udp_raw_socket():
+        return socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_UDP)
+
+    @staticmethod
+    def __get_tcp_raw_socket():
+        return socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
+
+    @staticmethod
+    def __get_icmp_raw_socket():
+        return socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_ICMP)

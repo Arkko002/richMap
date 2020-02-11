@@ -7,5 +7,5 @@ class CustomSocket(socket.socket):
     def __init__(self, family, type, proto, fileno=None, *args, **kwargs):
         for key, value in kwargs.items():
             self.spoofed_properties[key] = value
-
+            
         super().__init__(family, type, proto, fileno)

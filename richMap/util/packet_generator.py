@@ -38,7 +38,7 @@ class PacketGenerator(object):
                       oper,
                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  # ARP sender MAC
                       int(local_ip_arr[0]), int(local_ip_arr[1]), int(local_ip_arr[2]), int(local_ip_arr[3]),  # ARP sender IP
-                      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, # ARP target MAC
+                      0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  # ARP target MAC
                       int(dst_ip_arr[0]), int(dst_ip_arr[1]), int(dst_ip_arr[2]), int(dst_ip_arr[3]))  # ARP target IP
         return header
 
@@ -51,14 +51,14 @@ class PacketGenerator(object):
 
         header = pack("!6B6B2BHHBBH6B4B6B4B",
                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  # Ethernet layer dest. MAC
-                      eth_src_mac[0], eth_src_mac[1], eth_src_mac[2], eth_src_mac[3], eth_src_mac[4], eth_src_mac[5], # Eth. sender MAC
+                      eth_src_mac[0], eth_src_mac[1], eth_src_mac[2], eth_src_mac[3], eth_src_mac[4], eth_src_mac[5],  # Eth. sender MAC
                       0x08, 0x06,  # ETH protocol (ARP)
                       htype,
                       ptype,
                       hlen,
                       plen,
                       oper,
-                      eth_src_mac[0], eth_src_mac[1], eth_src_mac[2], eth_src_mac[3], eth_src_mac[4], eth_src_mac[5], # ARP sender MAC
+                      eth_src_mac[0], eth_src_mac[1], eth_src_mac[2], eth_src_mac[3], eth_src_mac[4], eth_src_mac[5],  # ARP sender MAC
                       int(local_ip_arr[0]), int(local_ip_arr[1]), int(local_ip_arr[2]), int(local_ip_arr[3]),  # ARP sender IP)
                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  # ARP target MAC
                       int(dst_ip_arr[0]), int(dst_ip_arr[1]), int(dst_ip_arr[2]), int(dst_ip_arr[3])  # ARP target IP)

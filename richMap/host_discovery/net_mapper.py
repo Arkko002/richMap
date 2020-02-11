@@ -1,7 +1,7 @@
 import os
 import re
 import socket
-from richMap.util.packetgenerator import PacketGenerator
+from richMap.util.packet_generator import PacketGenerator
 import random
 from time import sleep
 

@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-from .port_scanning.portscanner import PortScanner
-from .host_discovery.netmapper import Netmapper
+from .port_scanning.port_scanner import PortScanner
+from .host_discovery.net_mapper import Netmapper
 
 
 class RichGUI(ttk.Frame):

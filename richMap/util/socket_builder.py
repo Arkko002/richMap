@@ -1,6 +1,6 @@
 from random import randint
 from socket import SOCK_RAW, AF_PACKET
-from richMap.util.customsocket import CustomSocket
+from richMap.util.custom_socket import CustomSocket
 
 
 class SocketBuilder(object):
