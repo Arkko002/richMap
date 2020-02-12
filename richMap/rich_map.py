@@ -1,8 +1,8 @@
 import argparse
 from .port_scanning.port_scanner import PortScanner
 from .host_discovery.net_mapper import Netmapper
-from richMap.map_types import MapTypes
-from richMap.scan_types import ScanTypes
+from richMap.host_discovery.map_types import MapTypes
+from richMap.port_scanning.scan_types import ScanTypes
 import sys
 
 

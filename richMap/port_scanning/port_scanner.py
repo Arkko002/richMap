@@ -1,15 +1,14 @@
 import socket
 
-from richMap.port_scanning import socket_type
 from richMap.port_scanning.host_result import HostResult
 from richMap.port_scanning.port_scanner_socket import PortScannerSocket
 from richMap.port_scanning.response_packet import TcpResponsePacket, TcpFlags
 from richMap.port_scanning.socket_type import SocketType
 from richMap.util.packet_generator import PacketGenerator
-from richMap.scan_types import ScanTypes
+from richMap.port_scanning.scan_types import ScanTypes
 from richMap.port_scanning.port_result import PortState, PortResult
 import re
-from enum import Enum
+
 
 class PortScanner(object):
     def __init__(self, target: str, scan_type: ScanTypes, port_range):
