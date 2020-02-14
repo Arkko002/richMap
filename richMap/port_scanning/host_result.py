@@ -1,4 +1,4 @@
-from richMap.port_scanning.port_result import PortResult
+from richMap.port_scanning.port_result import PortResult, PortState
 from richMap.port_scanning.scan_types import ScanTypes
 
 
@@ -8,8 +8,8 @@ class HostResult:
         self.scan_type = scan_type
         self.port_results = []
 
-    def append_port_result(self, port, port_open : bool):
-        port_result = PortResult(port, port_open)
+    def append_port_result(self, port, port_state: PortState):
+        port_result = PortResult(port, port_state)
 
         self.port_results.append(port_result)
 

@@ -1,4 +1,14 @@
 import argparse
+
+from richMap.port_scanning.scans.ack_scan import AckScan
+from richMap.port_scanning.scans.fin_scan import FinScan
+from richMap.port_scanning.scans.maimon_scan import MaimonScan
+from richMap.port_scanning.scans.null_scan import NullScan
+from richMap.port_scanning.scans.syn_sca import SynScan
+from richMap.port_scanning.scans.tcp_scan import TcpScan
+from richMap.port_scanning.scans.udp_scan import UdpScan
+from richMap.port_scanning.scans.window_scan import WindowScan
+from richMap.port_scanning.scans.xmas_scan import XmasScan
 from .port_scanning.port_scanner import PortScanner
 from .host_discovery.net_mapper import Netmapper
 from richMap.host_discovery.map_types import MapTypes
@@ -12,6 +22,18 @@ class CLIController(object):
         self.arguments = self.__parse_args()
         self.view = CLIView(self)
 
+        self.scans = {
+            ScanTypes.T: TcpScan,
+            ScanTypes.S: SynScan,
+            ScanTypes.U: UdpScan,
+            ScanTypes.A: AckScan,
+            ScanTypes.F: FinScan,
+            ScanTypes.X: XmasScan,
+            ScanTypes.N: NullScan,
+            ScanTypes.M: MaimonScan,
+            ScanTypes.W: WindowScan
+        }
+
     @staticmethod
     def __parse_args(argv=sys.argv[1:]):
         """Parses the command line arguments"""
@@ -23,10 +45,10 @@ class CLIController(object):
         parser.add_argument("-t", "--target", type=str, action="store", required=True,
                             dest="target", help="IP of the target machine / network.")
 
-        parser.add_argument("-s", "--scan", type=str, action="store", choices=ScanTypes.name,
+        parser.add_argument("-s", "--scan", type=str, action="store",
                             dest="scan_type", help="The type of port scan to be used.")
 
-        parser.add_argument("-m", "--map", action="store", choices=MapTypes.name,
+        parser.add_argument("-m", "--map", action="store",
                             dest="map_type", help="The type of network scan to be used")
 
         parser.add_argument("-i", "--interface", help="Interface to be checked with ARP scan",
@@ -41,9 +63,13 @@ class CLIController(object):
         """Sends the scan request to Model classes and delivers results to View class"""
 
         if self.arguments.scan_type is not None:
-            scan = PortScanner(target=self.arguments.target, scan_type=ScanTypes[self.arguments.scan_type],
-                               port_range=self.arguments.range)
-            result = scan.perform_scan()
+            if self.arguments.scan_type not in self.scans:
+                return "Wrong scan type specified"
+
+            scan = self.scans[self.arguments.scan_type]
+            scanner = PortScanner(self.arguments.target, scan_type=self.arguments.scan_type,
+                                  scan=scan, port_range=self.arguments.range)
+            result = scanner.perform_scan()
 
             self.view.print_port_scan_results(result)
 

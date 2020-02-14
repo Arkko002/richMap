@@ -50,11 +50,11 @@ class PortScannerSocket:
 
     # TODO Thread for each socket
     @staticmethod
-    def __await_response(socket):
+    def __await_response(soc):
         """Returns None if socket timed out, otherwise returns incoming packet"""
 
         try:
-            recv_packet = socket.recv(65535)
-        except socket.timeout:
+            recv_packet = soc.recv(65535)
+        except soc.timeout:
             return None
         return recv_packet

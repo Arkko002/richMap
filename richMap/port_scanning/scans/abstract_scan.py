@@ -14,7 +14,7 @@ class AbstractScan(ABC):
     def get_scan_result(self, target, port, timeout):
         pass
 
-    def __send_probe_packet_and_get_result(self, packet, target, port, timeout):
+    def send_probe_packet_and_get_result(self, packet, target, port, timeout):
         """Sends probe packet, returns PortState if probe failed, otherwise returns ResponsePacket"""
         results = self.soc.send_packet_and_return_result(packet, target, port, timeout)
 

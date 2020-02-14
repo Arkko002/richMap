@@ -7,7 +7,7 @@ from richMap.util.packet_generator import PacketGenerator
 class FinScan(AbstractScan):
     def get_scan_result(self, target, port, timeout):
         packet = PacketGenerator.generate_tcp_packet(port, fin=1)
-        result = super().__send_probe_packet_and_get_result(packet, target, port, 3.0)
+        result = super().send_probe_packet_and_get_result(packet, target, port, timeout)
 
         if result is PortState:
             return result
