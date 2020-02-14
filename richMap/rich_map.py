@@ -1,5 +1,8 @@
 import argparse
 
+from richMap.host_discovery.mapping_types import MappingTypes
+from richMap.host_discovery.scans.arp_discovery import ArpDiscovery
+from richMap.host_discovery.scans.ping_discovery import PingDiscovery
 from richMap.port_scanning.scans.ack_scan import AckScan
 from richMap.port_scanning.scans.fin_scan import FinScan
 from richMap.port_scanning.scans.maimon_scan import MaimonScan
@@ -14,7 +17,6 @@ from .host_discovery.net_mapper import Netmapper
 from richMap.host_discovery.map_types import MapTypes
 from richMap.port_scanning.scan_types import ScanTypes
 import sys
-
 
 class CLIController(object):
 
@@ -32,6 +34,11 @@ class CLIController(object):
             ScanTypes.N: NullScan,
             ScanTypes.M: MaimonScan,
             ScanTypes.W: WindowScan
+        }
+
+        self.host_discovery = {
+            MappingTypes.PingScan: PingDiscovery,
+            MappingTypes.ArpScan: ArpDiscovery,
         }
 
     @staticmethod
@@ -67,15 +74,21 @@ class CLIController(object):
                 return "Wrong scan type specified"
 
             scan = self.scans[self.arguments.scan_type]
-            scanner = PortScanner(self.arguments.target, scan_type=self.arguments.scan_type,
+            scan_type = ScanTypes(self.arguments.scan_type)
+            scanner = PortScanner(self.arguments.target, scan_type,
                                   scan=scan, port_range=self.arguments.range)
             result = scanner.perform_scan()
 
             self.view.print_port_scan_results(result)
 
         elif self.arguments.map_type is not None:
-            mapper = Netmapper(network_ip=self.arguments.target, scan_type=MapTypes[self.arguments.map_type],
-                               net_interface=self.arguments.net_int)
+            if self.arguments.map_type not in self.host_discovery:
+                return "Wrong scan type specified"
+
+            host_discovery = self.host_discovery[self.arguments.map_type]
+            host_discovery_type = MappingTypes(self.arguments.map_type)
+            mapper = Netmapper(network_ip=self.arguments.target, host_discovery_type=host_discovery_type,
+                               host_discovery=host_discovery, net_interface=self.arguments.net_int)
             result = mapper.map_network()
 
             self.view.print_net_map_results(result)
