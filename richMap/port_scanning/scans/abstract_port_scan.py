@@ -1,15 +1,12 @@
 from abc import ABC, abstractmethod
 
+from richMap.abstract_base_scanner import AbstractBaseScanner
 from richMap.port_scanning.port_result import PortState
-from richMap.port_scanning.port_scanner_socket import PortScannerSocket
 from richMap.port_scanning.response_packet import TcpResponsePacket, TcpFlags
 from richMap.util.packet_generator import PacketGenerator
 
 
-class AbstractScan(ABC):
-    def __init__(self, soc: PortScannerSocket):
-        self.soc = soc
-
+class AbstractPortScan(AbstractBaseScanner):
     @abstractmethod
     def get_scan_result(self, target, port, timeout):
         pass

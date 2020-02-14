@@ -3,15 +3,17 @@ import argparse
 from richMap.host_discovery.mapping_types import MappingTypes
 from richMap.host_discovery.scans.arp_discovery import ArpDiscovery
 from richMap.host_discovery.scans.ping_discovery import PingDiscovery
-from richMap.port_scanning.scans.ack_scan import AckScan
-from richMap.port_scanning.scans.fin_scan import FinScan
-from richMap.port_scanning.scans.maimon_scan import MaimonScan
-from richMap.port_scanning.scans.null_scan import NullScan
-from richMap.port_scanning.scans.syn_sca import SynScan
-from richMap.port_scanning.scans.tcp_scan import TcpScan
-from richMap.port_scanning.scans.udp_scan import UdpScan
-from richMap.port_scanning.scans.window_scan import WindowScan
-from richMap.port_scanning.scans.xmas_scan import XmasScan
+from richMap.port_scanning.scans.ack_scan import AckPortScan
+from richMap.port_scanning.scans.fin_scan import FinPortScan
+from richMap.port_scanning.scans.maimon_scan import MaimonPortScan
+from richMap.port_scanning.scans.null_scan import NullPortScan
+from richMap.port_scanning.scans.syn_sca import SynPortScan
+from richMap.port_scanning.scans.tcp_scan import TcpPortScan
+from richMap.port_scanning.scans.udp_scan import UdpPortScan
+from richMap.port_scanning.scans.window_scan import WindowPortScan
+from richMap.port_scanning.scans.xmas_scan import XmasPortScan
+from richMap.port_scanning.socket_type import SocketType
+from richMap.scanner_socket import ScannerSocket
 from .port_scanning.port_scanner import PortScanner
 from .host_discovery.net_mapper import Netmapper
 from richMap.host_discovery.map_types import MapTypes
@@ -25,15 +27,15 @@ class CLIController(object):
         self.view = CLIView(self)
 
         self.scans = {
-            ScanTypes.T: TcpScan,
-            ScanTypes.S: SynScan,
-            ScanTypes.U: UdpScan,
-            ScanTypes.A: AckScan,
-            ScanTypes.F: FinScan,
-            ScanTypes.X: XmasScan,
-            ScanTypes.N: NullScan,
-            ScanTypes.M: MaimonScan,
-            ScanTypes.W: WindowScan
+            ScanTypes.T: TcpPortScan,
+            ScanTypes.S: SynPortScan,
+            ScanTypes.U: UdpPortScan,
+            ScanTypes.A: AckPortScan,
+            ScanTypes.F: FinPortScan,
+            ScanTypes.X: XmasPortScan,
+            ScanTypes.N: NullPortScan,
+            ScanTypes.M: MaimonPortScan,
+            ScanTypes.W: WindowPortScan
         }
 
         self.host_discovery = {
@@ -73,7 +75,14 @@ class CLIController(object):
             if self.arguments.scan_type not in self.scans:
                 return "Wrong scan type specified"
 
-            scan = self.scans[self.arguments.scan_type]
+            if self.arguments.scan_type == ScanTypes.T:
+                soc = ScannerSocket(SocketType.TCP)
+            elif self.arguments.scan_type == ScanTypes.U:
+                soc = ScannerSocket(SocketType.UDP)
+            else:
+                soc = ScannerSocket(SocketType.TCPRaw)
+
+            scan = self.scans[self.arguments.scan_type](soc)
             scan_type = ScanTypes(self.arguments.scan_type)
             scanner = PortScanner(self.arguments.target, scan_type,
                                   scan=scan, port_range=self.arguments.range)
@@ -85,7 +94,14 @@ class CLIController(object):
             if self.arguments.map_type not in self.host_discovery:
                 return "Wrong scan type specified"
 
-            host_discovery = self.host_discovery[self.arguments.map_type]
+            if self.arguments.host_discovery_type.IcmpScan:
+                soc = ScannerSocket(SocketType.ICMP)
+            elif self.arguments.host_discovery_type.PingScan:
+                soc = ScannerSocket(SocketType.TCP)
+            else:
+                soc = SocketType(SocketType.TCPRaw)
+
+            host_discovery = self.host_discovery[self.arguments.map_type](soc)
             host_discovery_type = MappingTypes(self.arguments.map_type)
             mapper = Netmapper(network_ip=self.arguments.target, host_discovery_type=host_discovery_type,
                                host_discovery=host_discovery, net_interface=self.arguments.net_int)

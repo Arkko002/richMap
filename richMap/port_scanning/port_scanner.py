@@ -3,7 +3,7 @@ import socket
 
 from richMap.port_scanning.host_result import HostResult
 from richMap.port_scanning.port_result import PortResult
-from richMap.port_scanning.port_scanner_socket import PortScannerSocket
+from richMap.scanner_socket import ScannerSocket
 from richMap.port_scanning.scan_types import ScanTypes
 from richMap.port_scanning.socket_type import SocketType
 
@@ -14,16 +14,6 @@ class PortScanner(object):
         self.scan_type = scan_type
         self.scan = scan
         self.port_range = port_range.split("-")
-
-        if scan_type == ScanTypes.T:
-            self.soc = PortScannerSocket(SocketType.TCP)
-        elif scan_type == ScanTypes.U:
-            self.soc = PortScannerSocket(SocketType.UDP)
-        else:
-            self.soc = PortScannerSocket(SocketType.TCPRaw)
-
-    def __del__(self):
-        self.soc.close_sockets()
 
     def perform_scan(self):
         """Performs a scans on target with parameters provided on object initalisation.

@@ -5,7 +5,7 @@ from richMap.port_scanning.socket_factory import SocketFactory
 from richMap.port_scanning.socket_type import SocketType
 
 
-class PortScannerSocket:
+class ScannerSocket:
     def __init__(self, socket_type: SocketType):
         soc_factory = SocketFactory()
 

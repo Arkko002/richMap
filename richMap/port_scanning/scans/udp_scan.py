@@ -1,9 +1,9 @@
 from richMap.port_scanning.port_result import PortState
-from richMap.port_scanning.scans.abstract_scan import AbstractScan
+from richMap.port_scanning.scans.abstract_port_scan import AbstractPortScan
 from richMap.util.packet_generator import PacketGenerator
 
 
-class UdpScan(AbstractScan):
+class UdpPortScan(AbstractPortScan):
     def get_scan_result(self, target, port, timeout):
         packet = PacketGenerator.generate_udp_packet(port)
         return self.__send_udp_probe_packet_and_get_result(packet, target, port, timeout)

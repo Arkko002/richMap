@@ -1,7 +1,11 @@
 from struct import pack, unpack
 from socket import gethostbyname, gethostname
 
+ICMP_HEADER_FORMAT = "!BBHHH"
+TCP_HEADER_FORMAT = "!HHLLBBHHH"
+UDP_HEADER_FORMAT = "!HHHH"
 
+# TODO Rewrite this
 class PacketGenerator(object):
 
     @staticmethod
@@ -11,12 +15,12 @@ class PacketGenerator(object):
             offset_res = (hdr_len << 4) + 0
             flags = fin + (syn << 1) + (rst << 2) + (psh << 3) + (ack << 4) + (urg << 5)
 
-            header = pack("!HHLLBBHHH", src_port, dst_port, seq, ack_seq, offset_res, flags, window, checksum, urg_ptr)
+            header = pack(TCP_HEADER_FORMAT, src_port, dst_port, seq, ack_seq, offset_res, flags, window, checksum, urg_ptr)
             return header
 
     @staticmethod
     def generate_udp_packet(dst_port, src_port=20, hdr_len=8, checksum=0):
-            header = pack("!HHHH", src_port, dst_port, hdr_len, checksum)
+            header = pack(UDP_HEADER_FORMAT, src_port, dst_port, hdr_len, checksum)
             return header
 
     @staticmethod
@@ -41,6 +45,10 @@ class PacketGenerator(object):
                       0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  # ARP target MAC
                       int(dst_ip_arr[0]), int(dst_ip_arr[1]), int(dst_ip_arr[2]), int(dst_ip_arr[3]))  # ARP target IP
         return header
+
+    def generate_icmp_packet(self):
+        pass
+
 
     @staticmethod
     def generate_spoofed_eth_arp_packet(eth_src_mac, dst_ip: str, htype=0x0001, ptype=0x0800, hlen=0x06, plen=0x04,
