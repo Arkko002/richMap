@@ -8,7 +8,7 @@ from richMap.util.packet_generator import PacketGenerator
 
 class AbstractPortScan(AbstractBaseScanner):
     @abstractmethod
-    def get_scan_result(self, target, port, timeout):
+    def get_scan_result(self, target, port, timeout) -> PortState:
         pass
 
     def send_probe_packet_and_get_result(self, packet, target, port, timeout):

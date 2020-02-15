@@ -5,8 +5,8 @@ from richMap.util.packet_generator import PacketGenerator
 
 
 class SynPortScan(AbstractPortScan):
-    def get_scan_result(self, target, port, timeout):
-        packet = PacketGenerator.generate_tcp_packet(port, syn=1)
+    def get_scan_result(self, target, port, timeout) -> PortState:
+        packet = PacketGenerator.generate_tcp_header(port, syn=1)
         result = super().send_probe_packet_and_get_result(packet, target, port, timeout)
 
         if result is PortState:

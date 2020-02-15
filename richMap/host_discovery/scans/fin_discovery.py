@@ -5,5 +5,5 @@ from richMap.util.packet_generator import PacketGenerator
 
 class FinDiscovery(AbstractHostDiscovery):
     def get_discovery_result(self, target_ip) -> HostDiscoveryResult:
-        packet = PacketGenerator.generate_tcp_packet(0, fin=1)
+        packet = PacketGenerator.generate_tcp_header(0, fin=1)
         return super().send_probe_packet_and_get_result(packet, target_ip, 0, 3.0)
