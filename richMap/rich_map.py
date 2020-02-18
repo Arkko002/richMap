@@ -1,47 +1,23 @@
 import argparse
 
-from richMap.host_discovery.mapping_types import MappingTypes
-from richMap.host_discovery.scans.arp_discovery import ArpDiscovery
-from richMap.host_discovery.scans.ping_discovery import PingDiscovery
-from richMap.port_scanning.scans.ack_scan import AckPortScan
-from richMap.port_scanning.scans.fin_scan import FinPortScan
-from richMap.port_scanning.scans.maimon_scan import MaimonPortScan
-from richMap.port_scanning.scans.null_scan import NullPortScan
-from richMap.port_scanning.scans.syn_sca import SynPortScan
-from richMap.port_scanning.scans.tcp_scan import TcpPortScan
-from richMap.port_scanning.scans.udp_scan import UdpPortScan
-from richMap.port_scanning.scans.window_scan import WindowPortScan
-from richMap.port_scanning.scans.xmas_scan import XmasPortScan
-from richMap.port_scanning.socket_type import SocketType
+from richMap.host_discovery.network_discovery_result import NetworkDiscoveryResult
+from richMap.port_scanning.host_result import HostResult
+from richMap.scan_factories.host_discovery_scan_factory import HostDiscoveryScanFactory
+from richMap.scan_factories.port_scanner_factory import PortScannerFactory
+from richMap.scan_factories.socket_type import SocketType
 from richMap.scanner_socket import ScannerSocket
 from .port_scanning.port_scanner import PortScanner
 from .host_discovery.net_mapper import Netmapper
-from richMap.host_discovery.map_types import MapTypes
+from richMap.host_discovery.mapping_types import MappingTypes
 from richMap.port_scanning.scan_types import ScanTypes
 import sys
+
 
 class CLIController(object):
 
     def __init__(self):
         self.arguments = self.__parse_args()
         self.view = CLIView(self)
-
-        self.scans = {
-            ScanTypes.T: TcpPortScan,
-            ScanTypes.S: SynPortScan,
-            ScanTypes.U: UdpPortScan,
-            ScanTypes.A: AckPortScan,
-            ScanTypes.F: FinPortScan,
-            ScanTypes.X: XmasPortScan,
-            ScanTypes.N: NullPortScan,
-            ScanTypes.M: MaimonPortScan,
-            ScanTypes.W: WindowPortScan
-        }
-
-        self.host_discovery = {
-            MappingTypes.PingScan: PingDiscovery,
-            MappingTypes.ArpScan: ArpDiscovery,
-        }
 
     @staticmethod
     def __parse_args(argv=sys.argv[1:]):
@@ -72,39 +48,32 @@ class CLIController(object):
         """Sends the scan request to Model classes and delivers results to View class"""
 
         if self.arguments.scan_type is not None:
-            if self.arguments.scan_type not in self.scans:
-                return "Wrong scan type specified"
-
-            if self.arguments.scan_type == ScanTypes.T:
-                soc = ScannerSocket(SocketType.TCP)
-            elif self.arguments.scan_type == ScanTypes.U:
-                soc = ScannerSocket(SocketType.UDP)
-            else:
-                soc = ScannerSocket(SocketType.TCPRaw)
-
-            scan = self.scans[self.arguments.scan_type](soc)
+            scanner_factory = PortScannerFactory()
             scan_type = ScanTypes(self.arguments.scan_type)
-            scanner = PortScanner(self.arguments.target, scan_type,
-                                  scan=scan, port_range=self.arguments.range)
+
+            scan = scanner_factory.get_scanner(self.arguments.scan_type)
+            if scan is str:
+                self.view.print_error(scan)
+
+            host_result = HostResult(self.arguments.target, scan_type)
+
+            scanner = PortScanner(self.arguments.target, scan, self.arguments.range, host_result)
+
             result = scanner.perform_scan()
 
             self.view.print_port_scan_results(result)
 
         elif self.arguments.map_type is not None:
-            if self.arguments.map_type not in self.host_discovery:
-                return "Wrong scan type specified"
-
-            if self.arguments.host_discovery_type.IcmpScan:
-                soc = ScannerSocket(SocketType.ICMP)
-            elif self.arguments.host_discovery_type.PingScan:
-                soc = ScannerSocket(SocketType.TCP)
-            else:
-                soc = SocketType(SocketType.TCPRaw)
-
-            host_discovery = self.host_discovery[self.arguments.map_type](soc)
+            host_discovery_factory = HostDiscoveryScanFactory()
             host_discovery_type = MappingTypes(self.arguments.map_type)
-            mapper = Netmapper(network_ip=self.arguments.target, host_discovery_type=host_discovery_type,
-                               host_discovery=host_discovery, net_interface=self.arguments.net_int)
+
+            scan = host_discovery_factory.get_scanner(self.arguments.map_type)
+            if scan is str:
+                self.view.print_error(scan)
+
+            network_result = NetworkDiscoveryResult(self.arguments.target, host_discovery_type)
+
+            mapper = Netmapper(self.arguments.target, network_result, scan)
             result = mapper.map_network()
 
             self.view.print_net_map_results(result)

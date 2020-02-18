@@ -9,11 +9,13 @@ from richMap.port_scanning.scans.udp_scan import UdpPortScan
 from richMap.port_scanning.scans.window_scan import WindowPortScan
 from richMap.port_scanning.scans.xmas_scan import XmasPortScan
 from richMap.scan_factories.abstract_scanner_factory import AbstractScannerFactory
+from richMap.scan_factories.socket_type import SocketType
+from richMap.scanner_socket import ScannerSocket
 
 
 class PortScannerFactory(AbstractScannerFactory):
-    def __init__(self):
-        self.scans = {
+    def get_scanner(self, scanner_type):
+        scans = {
             ScanTypes.T: TcpPortScan,
             ScanTypes.S: SynPortScan,
             ScanTypes.U: UdpPortScan,
@@ -25,6 +27,17 @@ class PortScannerFactory(AbstractScannerFactory):
             ScanTypes.W: WindowPortScan
         }
 
-    def get_scanner(self, scanner_type, soc):
+        if scanner_type not in scans:
+            return "Wrong scan type specified"
+
+        scan_enum = ScanTypes(scanner_type)
+
+        if scan_enum == ScanTypes.T:
+            soc = ScannerSocket(SocketType.TCP)
+        elif scan_enum == ScanTypes.U:
+            soc = ScannerSocket(SocketType.UDP)
+        else:
+            soc = ScannerSocket(SocketType.TCPRaw)
+
         return self.scans[scanner_type](soc)
 

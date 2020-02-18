@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class MappingTypes(Enum):
-    PingScan = 0
-    ArpScan = 1
-    IcmpScan = 2
-    SynScan = 3
+    P = 0
+    A = 1
+    I = 2
+    S = 3

@@ -8,11 +8,6 @@ class HostResult:
         self.scan_type = scan_type
         self.port_results = []
 
-    def append_port_result(self, port, port_state: PortState):
-        port_result = PortResult(port, port_state)
-
-        self.port_results.append(port_result)
-
     def return_positive_port_results(self):
         positive_results = []
         for result in self.port_results:

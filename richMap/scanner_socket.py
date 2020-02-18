@@ -1,8 +1,8 @@
 import socket
 from collections import namedtuple
 
-from richMap.port_scanning.socket_factory import SocketFactory
-from richMap.port_scanning.socket_type import SocketType
+from richMap.scan_factories.socket_factory import SocketFactory
+from richMap.scan_factories.socket_type import SocketType
 
 
 class ScannerSocket:
