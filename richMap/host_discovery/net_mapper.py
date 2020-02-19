@@ -1,8 +1,5 @@
-import re
 import ipaddress
-
-from richMap.host_discovery.mapping_types import MappingTypes
-
+import re
 
 # TODO ICMP Ping, TCP SYN/Fin/Null/XMAS Ping, UDP Ping, IP Ping, Reverse DNS
 from richMap.host_discovery.network_discovery_result import NetworkDiscoveryResult

@@ -1,16 +1,14 @@
 import argparse
+import sys
 
+from richMap.host_discovery.host_discovery_types import HostDiscoveryTypes
 from richMap.host_discovery.network_discovery_result import NetworkDiscoveryResult
 from richMap.port_scanning.host_result import HostResult
-from richMap.scan_factories.host_discovery_scan_factory import HostDiscoveryScanFactory
-from richMap.scan_factories.port_scanner_factory import PortScannerFactory
-from richMap.scan_factories.socket_type import SocketType
-from richMap.scanner_socket import ScannerSocket
-from .port_scanning.port_scanner import PortScanner
-from .host_discovery.net_mapper import Netmapper
-from richMap.host_discovery.mapping_types import MappingTypes
 from richMap.port_scanning.scan_types import ScanTypes
-import sys
+from richMap.scan_factories.host_discovery_scan_factory import HostDiscoveryScanFactory
+from richMap.scan_factories.port_scan_factory import PortScanFactory
+from .host_discovery.net_mapper import Netmapper
+from .port_scanning.port_scanner import PortScanner
 
 
 class CLIController(object):
@@ -48,7 +46,7 @@ class CLIController(object):
         """Sends the scan request to Model classes and delivers results to View class"""
 
         if self.arguments.scan_type is not None:
-            scanner_factory = PortScannerFactory()
+            scanner_factory = PortScanFactory()
             scan_type = ScanTypes(self.arguments.scan_type)
 
             scan = scanner_factory.get_scanner(self.arguments.scan_type)
@@ -65,7 +63,7 @@ class CLIController(object):
 
         elif self.arguments.map_type is not None:
             host_discovery_factory = HostDiscoveryScanFactory()
-            host_discovery_type = MappingTypes(self.arguments.map_type)
+            host_discovery_type = HostDiscoveryTypes(self.arguments.map_type)
 
             scan = host_discovery_factory.get_scanner(self.arguments.map_type)
             if scan is str:

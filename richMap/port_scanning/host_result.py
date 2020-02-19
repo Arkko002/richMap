@@ -1,4 +1,3 @@
-from richMap.port_scanning.port_result import PortResult, PortState
 from richMap.port_scanning.scan_types import ScanTypes
 
 

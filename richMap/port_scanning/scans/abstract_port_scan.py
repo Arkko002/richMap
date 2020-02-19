@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from richMap.abstract_base_scanner import AbstractBaseScanner
 from richMap.port_scanning.port_result import PortState

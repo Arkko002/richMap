@@ -3,7 +3,6 @@ import socket
 
 from richMap.port_scanning.host_result import HostResult
 from richMap.port_scanning.port_result import PortResult
-from richMap.port_scanning.scan_types import ScanTypes
 
 
 class PortScanner(object):

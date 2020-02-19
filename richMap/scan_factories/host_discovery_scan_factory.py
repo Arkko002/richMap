@@ -1,4 +1,4 @@
-from richMap.host_discovery.mapping_types import MappingTypes
+from richMap.host_discovery.host_discovery_types import HostDiscoveryTypes
 from richMap.host_discovery.scans.arp_discovery import ArpDiscovery
 from richMap.host_discovery.scans.icmp_discovery import IcmpDiscovery
 from richMap.host_discovery.scans.ping_discovery import PingDiscovery
@@ -11,20 +11,20 @@ from richMap.scanner_socket import ScannerSocket
 class HostDiscoveryScanFactory(AbstractScannerFactory):
     def get_scanner(self, scanner_type):
         host_discovery = {
-            MappingTypes.P: PingDiscovery,
-            MappingTypes.A: ArpDiscovery,
-            MappingTypes.I: IcmpDiscovery,
-            MappingTypes.S: SynDiscovery
+            HostDiscoveryTypes.P: PingDiscovery,
+            HostDiscoveryTypes.A: ArpDiscovery,
+            HostDiscoveryTypes.I: IcmpDiscovery,
+            HostDiscoveryTypes.S: SynDiscovery
         }
 
         if scanner_type not in host_discovery:
             return "Wrong scan type specified"
 
         socket_swticher = {
-            MappingTypes.I: SocketType.ICMP,
-            MappingTypes.A: SocketType.TCPRaw,
-            MappingTypes.P: SocketType.TCP,
-            MappingTypes.S: SocketType.TCPRaw
+            HostDiscoveryTypes.I: SocketType.ICMP,
+            HostDiscoveryTypes.A: SocketType.TCPRaw,
+            HostDiscoveryTypes.P: SocketType.TCP,
+            HostDiscoveryTypes.S: SocketType.TCPRaw
         }
 
         soc = ScannerSocket(socket_swticher[scanner_type])

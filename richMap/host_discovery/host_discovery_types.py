@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class MappingTypes(Enum):
+class HostDiscoveryTypes(Enum):
     P = 0
     A = 1
     I = 2

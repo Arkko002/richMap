@@ -13,7 +13,7 @@ from richMap.scan_factories.socket_type import SocketType
 from richMap.scanner_socket import ScannerSocket
 
 
-class PortScannerFactory(AbstractScannerFactory):
+class PortScanFactory(AbstractScannerFactory):
     def get_scanner(self, scanner_type):
         scans = {
             ScanTypes.T: TcpPortScan,
@@ -39,5 +39,5 @@ class PortScannerFactory(AbstractScannerFactory):
         else:
             soc = ScannerSocket(SocketType.TCPRaw)
 
-        return self.scans[scanner_type](soc)
+        return scans[scanner_type](soc)
 

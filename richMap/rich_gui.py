@@ -1,5 +1,13 @@
 from tkinter import *
 from tkinter import ttk
+
+from richMap.gui_util.command_parser import CommandParser
+from richMap.host_discovery.host_discovery_types import HostDiscoveryTypes
+from richMap.host_discovery.network_discovery_result import NetworkDiscoveryResult
+from richMap.port_scanning.host_result import HostResult
+from richMap.port_scanning.scan_types import ScanTypes
+from richMap.scan_factories.host_discovery_scan_factory import HostDiscoveryScanFactory
+from richMap.scan_factories.port_scan_factory import PortScanFactory
 from .port_scanning.port_scanner import PortScanner
 from .host_discovery.net_mapper import Netmapper
 
@@ -20,34 +28,32 @@ class RichGUI(ttk.Frame):
         self.outputs_frame.grid(column=0, row=1, sticky=(E,))
 
     def perform_scan(self, target: str, commands: str):
-        commands_list = commands.split(" ")
+        command_parser = CommandParser()
+        commands_dict = parse_commands(commands)
 
-        range_str = None
-        net_interface = None
+        if "m" in commands_dict:
+            host_discovery_factory = HostDiscoveryScanFactory()
+            scan = host_discovery_factory.get_scanner(commands_dict["m"])
+            discovery_type = HostDiscoveryTypes(commands_dict["m"])
 
-        if "-m" or "-s" not in commands_list:
-            self.outputs_frame.print_error(
-                "You need to select the scan/map type")
-            return
+            network_discovery_result = NetworkDiscoveryResult(target, discovery_type)
 
-        for command in commands_list:
-            if command.startswith("-m"):
-                scan_type = command.replace("-m", "")
-            elif command.startswith("-s"):
-                scan_type = command.replace("-s", "")
-            elif command.startswith("-r"):
-                range_str = command.replace("-r", "")
-            elif command.startswith("-i"):
-                net_interface = command.replace("-i", "")
-
-        if "-m" in commands:
-            mapper = Netmapper(
-                network_ip=target, scan_type=scan_type, net_interface=net_interface)
+            mapper = Netmapper(network_ip=target,
+                               host_discovery=scan,
+                               network_result=network_discovery_result)
             self.outputs_frame.print_scan_result(mapper.map_network())
 
         if "-s" in commands:
-            scan = PortScanner(
-                target=target, scan_type=scan_type, port_range=range_str)
+            port_scan_factory = PortScanFactory()
+            scan = port_scan_factory.get_scanner(commands_dict["s"])
+            scan_type = ScanTypes(commands_dict["s"])
+
+            host_result = HostResult(target, scan_type)
+
+            scan = PortScanner(target=target,
+                               port_range=commands_dict["r"],
+                               scan=scan,
+                               host_result=host_result)
             self.outputs_frame.print_scan_result(scan.perform_scan())
 
         self.hosts_frame.add_host(target)
@@ -91,7 +97,7 @@ class InputsFrame(ttk.Frame):
         self.verbosity_label.grid(column=4, row=1)
         self.verbosity_combobox.grid(column=5, row=1)
 
-    def add_scan_to_cmd_entry(self, *args):
+    def add_scan_to_cmd_entry(self):
 
         scan_types = {
             "Ping Scan": "-mP",
@@ -153,7 +159,7 @@ class HostsFrame(ttk.Frame):
                 return
         self.host_listbox.insert(END, host)
 
-    def set_host(self, *args):
+    def set_host(self):
         self.parent.inputs_frame.target_entry.delete(0, END)
         self.parent.inputs_frame.target_entry.insert(
             0, self.host_listbox.get(self.host_listbox.curselection()[0]))
