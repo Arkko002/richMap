@@ -1,4 +1,4 @@
-from richMap.port_scanning.port_result import PortState
+from richMap.port_scanning.model.port_result import PortState
 from richMap.port_scanning.scans.abstract_port_scan import AbstractPortScan
 
 

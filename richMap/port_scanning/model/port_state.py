@@ -8,8 +8,3 @@ class PortState(Enum):
     Unfiltered = 3,
     OpenFiltered = 4
 
-
-class PortResult:
-    def __init__(self, port, port_state: PortState):
-        self.port = port
-        self.port_state = port_state

@@ -1,4 +1,4 @@
-from richMap.port_scanning.scan_types import ScanTypes
+from richMap.port_scanning.model.scan_types import ScanTypes
 
 
 class HostResult:

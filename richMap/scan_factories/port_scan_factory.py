@@ -1,4 +1,4 @@
-from richMap.port_scanning.scan_types import ScanTypes
+from richMap.port_scanning.model.scan_types import ScanTypes
 from richMap.port_scanning.scans.ack_scan import AckPortScan
 from richMap.port_scanning.scans.fin_scan import FinPortScan
 from richMap.port_scanning.scans.maimon_scan import MaimonPortScan

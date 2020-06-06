@@ -1,8 +1,8 @@
 from abc import abstractmethod
 
 from richMap.abstract_base_scanner import AbstractBaseScanner
-from richMap.port_scanning.port_result import PortState
-from richMap.port_scanning.response_packet import TcpResponsePacket, TcpFlags
+from richMap.port_scanning.model.port_result import PortState
+from richMap.port_scanning.model.response_packet import TcpResponsePacket, TcpFlags
 from richMap.util.packet_generator import PacketGenerator
 
 
