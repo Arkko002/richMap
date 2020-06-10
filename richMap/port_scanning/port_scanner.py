@@ -10,9 +10,13 @@ class PortScanner(object):
                  port_range,
                  host_result_factory: AbstractHostResultFactory,
                  port_result_factory: AbstractPortResultFactory):
+
         self.target = target
         self.scan = scan
-        self.port_range = port_range.split("-")
+
+        self.port_range = [int(port) for port in port_range]
+        # Currently scanned port
+        self.current_port = port_range[0]
 
         self.host_result = host_result_factory.get_host_result(target, scan.scan_type)
         self.port_result_factory = port_result_factory
@@ -26,11 +30,16 @@ class PortScanner(object):
         if r.match(self.target) is False:
             return "The given IP is not in the correct format"
 
-        for port in range(int(self.port_range[0]), int(self.port_range[1]) + 1):
-            # TODO timeout in scans switcher
-            port_state = self.scan.get_scan_result(self.target, port, 3.0)
-            port_result = self.port_result_factory.get_port_result(port, port_state)
-
-            self.host_result.port_results.append(port_result)
+        port_states = (state for state in self.port_state_generator(self.target, self.port_range, 3.0))
+        port_results = (self.port_result_generator(self.current_port, port_state) for port_state in port_states)
+        self.host_result.port_results = port_results
 
         return self.host_result
+
+    def port_state_generator(self, target, port_range, timeout):
+        for port in range(port_range[0], port_range[1]):
+            self.current_port = port
+            yield self.scan.get_scan_result(target, port, timeout)
+
+    def port_result_generator(self, port, port_state):
+        yield self.port_result_factory.get_port_result(port, port_state)

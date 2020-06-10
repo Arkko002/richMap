@@ -5,6 +5,4 @@ from richMap.port_scanning.result_factories.abstract_host_result_factory import 
 
 class HostResultFactory(AbstractHostResultFactory):
     def get_host_result(self, target_ip, scan_type: ScanTypes, **kwargs):
-        if
-
         return HostResult(target_ip, scan_type)
