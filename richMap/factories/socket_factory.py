@@ -1,6 +1,6 @@
 import os
 import socket
-from richMap.scan_factories.socket_type import SocketType
+from richMap.factories.socket_type import SocketType
 
 
 class SocketFactory:

@@ -3,10 +3,10 @@ from richMap.host_discovery.scans.abstract_host_discovery import AbstractHostDis
 from richMap.util.packet_generator import PacketGenerator
 
 
+# TODO
 class ArpDiscovery(AbstractHostDiscovery):
     def get_discovery_result(self, target_ip) -> HostDiscoveryResult:
-        packet = PacketGenerator.generate_arp_packet(dst_ip=target_ip)
-
+        packet = PacketGenerator.generate_arp_header(dst_ip=target_ip)
 
         rec_eth_header = PacketGenerator.unpack_eth_header(arp_result)
         rec_arp_header = PacketGenerator.unpack_arp_header(arp_result)
@@ -18,14 +18,7 @@ class ArpDiscovery(AbstractHostDiscovery):
                     if len(str(rec_arp_header[i])) == 1:
                         rec_mac_adr = rec_mac_adr + "0"
                     rec_mac_adr = rec_mac_adr + \
-                        str(hex(rec_arp_header[i])).replace("0x", "") + ":"
+                                  str(hex(rec_arp_header[i])).replace("0x", "") + ":"
                 return rec_mac_adr
         else:
-            return None
-
-    def __send_probe_packet_and_get_result(self, packet, target, port, timeout):
-        self.soc.send(packet)
-        arp_result = self._await_arp_response()
-
-        if arp_result is None:
             return None

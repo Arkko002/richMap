@@ -1,4 +1,4 @@
-from richMap.abstract_error_handling.abstract_error import AbstractError
+from richMap.error_handling.abstract_error import AbstractError
 
 
 class DiscoveryError(AbstractError):

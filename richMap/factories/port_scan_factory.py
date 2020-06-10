@@ -8,8 +8,8 @@ from richMap.port_scanning.scans.tcp_scan import TcpPortScan
 from richMap.port_scanning.scans.udp_scan import UdpPortScan
 from richMap.port_scanning.scans.window_scan import WindowPortScan
 from richMap.port_scanning.scans.xmas_scan import XmasPortScan
-from richMap.scan_factories.abstract_scanner_factory import AbstractScannerFactory
-from richMap.scan_factories.socket_type import SocketType
+from richMap.factories.abstract_scanner_factory import AbstractScannerFactory
+from richMap.factories.socket_type import SocketType
 from richMap.scanner_socket import ScannerSocket
 
 
@@ -39,5 +39,5 @@ class PortScanFactory(AbstractScannerFactory):
         else:
             soc = ScannerSocket(SocketType.TCPRaw)
 
-        return scans[scanner_type](soc)
+        return scans[scanner_type](soc, scanner_type)
 

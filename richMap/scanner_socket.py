@@ -1,8 +1,8 @@
 import socket
 from collections import namedtuple
 
-from richMap.scan_factories.socket_factory import SocketFactory
-from richMap.scan_factories.socket_type import SocketType
+from richMap.factories.socket_factory import SocketFactory
+from richMap.factories.socket_type import SocketType
 
 
 class ScannerSocket:
@@ -35,7 +35,7 @@ class ScannerSocket:
         self.icmp_soc.close()
 
     def __send_probe_packet(self, packet, target, port, timeout):
-        """Resend's the probe packet, returns the response packets or None in case of no response"""
+        """Resends the probe packet, returns the response packets or None in case of no response"""
 
         self.soc.settimeout(timeout)
         self.icmp_soc.settimeout(timeout)

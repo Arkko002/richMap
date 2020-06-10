@@ -3,8 +3,8 @@ from richMap.host_discovery.scans.arp_discovery import ArpDiscovery
 from richMap.host_discovery.scans.icmp_discovery import IcmpDiscovery
 from richMap.host_discovery.scans.ping_discovery import PingDiscovery
 from richMap.host_discovery.scans.syn_discovery import SynDiscovery
-from richMap.scan_factories.abstract_scanner_factory import AbstractScannerFactory
-from richMap.scan_factories.socket_type import SocketType
+from richMap.factories.abstract_scanner_factory import AbstractScannerFactory
+from richMap.factories.socket_type import SocketType
 from richMap.scanner_socket import ScannerSocket
 
 

@@ -3,7 +3,9 @@ from richMap.port_scanning.model.port_state import PortState
 
 
 class PortResult:
-    def __init__(self, port, port_state: PortState, error_type: ScannerErrorType):
+    def __init__(self, port, port_state: PortState, **kwargs):
         self.port = port
         self.port_state = port_state
-        self.error_type = error_type
+
+        if "error" in kwargs:
+            self.error = kwargs.get("error")

@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 
+from richMap.port_scanning.model.scan_types import ScanTypes
 from richMap.scanner_socket import ScannerSocket
 
 
-class AbstractBaseScanner(ABC):
-    def __init__(self, soc: ScannerSocket):
+class AbstractBaseScan(ABC):
+    def __init__(self, soc: ScannerSocket, scan_type: ScanTypes):
         self.soc = soc
+        self.scan_type = scan_type
 
     def __del__(self):
         self.soc.close_sockets()

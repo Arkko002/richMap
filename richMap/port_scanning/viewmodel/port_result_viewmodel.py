@@ -3,6 +3,7 @@ from richMap.port_scanning.model.port_result import PortResult
 from richMap.port_scanning.model.port_state import PortState
 from richMap.port_scanning.model.scan_types import ScanTypes
 
+
 # TODO Filtering the results based on rules from each scan
 class PortResultViewModel:
     def __init__(self, port_result: PortResult, scan_type: ScanTypes):
@@ -10,12 +11,12 @@ class PortResultViewModel:
         self.scan_type = scan_type
 
         self.port_state = port_result.port_state
-        self.port_state_str = self.__conver_port_state_to_str(port_result.port_state)
+        self.port_state_str = self.__convert_port_state_to_str(port_result.port_state)
 
         self.error_type = self.__convert_error_type
 
     @staticmethod
-    def __conver_port_state_to_str(port_state: PortState):
+    def __convert_port_state_to_str(port_state: PortState):
         port_state_switcher = {
             PortState.Closed: "Closed",
             PortState.Open: "Open",

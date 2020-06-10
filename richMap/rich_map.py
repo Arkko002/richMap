@@ -3,14 +3,16 @@ import sys
 
 from richMap.host_discovery.host_discovery_types import HostDiscoveryTypes
 from richMap.host_discovery.network_discovery_result import NetworkDiscoveryResult
-from richMap.port_scanning.host_result import HostResult
-from richMap.port_scanning.scan_types import ScanTypes
-from richMap.scan_factories.host_discovery_scan_factory import HostDiscoveryScanFactory
-from richMap.scan_factories.port_scan_factory import PortScanFactory
+from richMap.port_scanning.model.scan_types import ScanTypes
+from richMap.factories.host_discovery_scan_factory import HostDiscoveryScanFactory
+from richMap.factories.port_scan_factory import PortScanFactory
+from richMap.port_scanning.result_factories.host_result_factory import HostResultFactory
+from richMap.port_scanning.result_factories.port_result_factory import PortResultFactory
 from .host_discovery.net_mapper import Netmapper
 from .port_scanning.port_scanner import PortScanner
 
 
+# TODO Add viewmodels
 class CLIController(object):
 
     def __init__(self):
@@ -48,14 +50,18 @@ class CLIController(object):
         if self.arguments.scan_type is not None:
             scanner_factory = PortScanFactory()
             scan_type = ScanTypes(self.arguments.scan_type)
-
-            scan = scanner_factory.get_scanner(self.arguments.scan_type)
+            scan = scanner_factory.get_scanner(scan_type)
             if scan is str:
                 self.view.print_error(scan)
 
-            host_result = HostResult(self.arguments.target, scan_type)
+            host_result_factory = HostResultFactory()
+            port_result_factory = PortResultFactory()
 
-            scanner = PortScanner(self.arguments.target, scan, self.arguments.range, host_result)
+            scanner = PortScanner(self.arguments.target,
+                                  scan,
+                                  self.arguments.range,
+                                  host_result_factory,
+                                  port_result_factory)
 
             result = scanner.perform_scan()
 
@@ -65,7 +71,7 @@ class CLIController(object):
             host_discovery_factory = HostDiscoveryScanFactory()
             host_discovery_type = HostDiscoveryTypes(self.arguments.map_type)
 
-            scan = host_discovery_factory.get_scanner(self.arguments.map_type)
+            scan = host_discovery_factory.get_scanner(host_discovery_type)
             if scan is str:
                 self.view.print_error(scan)
 
@@ -96,10 +102,13 @@ class CLIView:
         }
 
         self.map_types = {
-            MapTypes.P: "Ping Scan",
-            MapTypes.A: "ARP Scan",
-            MapTypes.As: "ARP Stealth Scan",
-            MapTypes.Ap: "ARP Passive Scan"
+            HostDiscoveryTypes.P: "Ping Scan",
+            HostDiscoveryTypes.A: "ARP Scan",
+            HostDiscoveryTypes.F: "FIN Scan",
+            HostDiscoveryTypes.S: "SYN Scan",
+            HostDiscoveryTypes.N: "Null Scan",
+            HostDiscoveryTypes.I: "ICMP Scan",
+            HostDiscoveryTypes.X: "Xmas Scan"
         }
 
     def print_port_scan_results(self, results):
@@ -119,7 +128,7 @@ class CLIView:
     def print_net_map_results(self, results):
         """Prints out the results of network mapping"""
 
-        map_type_enum = MapTypes[self.parent.arguments.map]
+        map_type_enum = HostDiscoveryTypes[self.parent.arguments.map]
         map_type = self.map_types[map_type_enum]
         target = self.parent.arguments.target
         interface = self.parent.arguments.net_int

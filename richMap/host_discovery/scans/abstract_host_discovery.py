@@ -1,10 +1,10 @@
 from abc import abstractmethod
 
-from richMap.abstract_base_scanner import AbstractBaseScanner
+from richMap.abstract_base_scan import AbstractBaseScan
 from richMap.host_discovery.host_discovery_result import HostDiscoveryResult
 
 
-class AbstractHostDiscovery(AbstractBaseScanner):
+class AbstractHostDiscovery(AbstractBaseScan):
     @abstractmethod
     def get_discovery_result(self, target_ip) -> HostDiscoveryResult:
         pass
