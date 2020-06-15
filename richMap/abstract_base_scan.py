@@ -5,9 +5,8 @@ from richMap.scanner_socket import ScannerSocket
 
 
 class AbstractBaseScan(ABC):
-    def __init__(self, soc: ScannerSocket, scan_type: ScanTypes):
+    def __init__(self, soc: ScannerSocket):
         self.soc = soc
-        self.scan_type = scan_type
 
     def __del__(self):
         self.soc.close_sockets()
