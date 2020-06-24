@@ -28,13 +28,13 @@ class ScannerSocket:
             return False
 
     def send_packet_and_return_result(self, packet, target, port, timeout):
-        return self.__send_probe_packet(packet, target, port, timeout)
+        return self._send_probe_packet(packet, target, port, timeout)
 
     def close_sockets(self):
         self.soc.close()
         self.icmp_soc.close()
 
-    def __send_probe_packet(self, packet, target, port, timeout):
+    def _send_probe_packet(self, packet, target, port, timeout):
         """Resends the probe packet, returns the response packets or None in case of no response"""
 
         self.soc.settimeout(timeout)
@@ -42,15 +42,15 @@ class ScannerSocket:
 
         for i in range(3):
             self.soc.sendto(packet, (target, port))
-            tcp_result = self.__await_response(self.soc)
-            icmp_result = self.__await_response(self.icmp_soc)
+            tcp_result = self._await_response(self.soc)
+            icmp_result = self._await_response(self.icmp_soc)
             if tcp_result is not None or icmp_result is not None:
                 SocketResponses = namedtuple('Responses', ['soc_res', "icmp_res"])
                 return SocketResponses(tcp_result, icmp_result)
 
     # TODO Thread for each socket
     @staticmethod
-    def __await_response(soc):
+    def _await_response(soc):
         """Returns None if socket timed out, otherwise returns incoming packet"""
 
         try:

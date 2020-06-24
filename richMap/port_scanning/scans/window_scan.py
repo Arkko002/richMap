@@ -1,5 +1,5 @@
 from richMap.port_scanning.model.port_result import PortState
-from richMap.port_scanning.model.response_packet import TcpFlags
+from richMap.port_scanning.model.tcp_response_packet import TcpFlags
 from richMap.port_scanning.scans.abstract_port_scan import AbstractPortScan
 from richMap.util.packet_generator import PacketGenerator
 

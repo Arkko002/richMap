@@ -6,9 +6,9 @@ from richMap.util.packet_generator import PacketGenerator
 class UdpPortScan(AbstractPortScan):
     def get_scan_result(self, target, port, timeout) -> PortState:
         packet = PacketGenerator.generate_udp_header(port)
-        return self.__send_udp_probe_packet_and_get_result(packet, target, port, timeout)
+        return self._send_udp_probe_packet_and_get_result(packet, target, port, timeout)
 
-    def __send_udp_probe_packet_and_get_result(self, packet, target, port, timeout):
+    def _send_udp_probe_packet_and_get_result(self, packet, target, port, timeout):
         results = self.soc.send_packet_and_return_result(packet, target, port, timeout)
 
         if results.icmp_res is None and results.soc_res is None:
