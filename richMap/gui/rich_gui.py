@@ -4,14 +4,14 @@ from tkinter import ttk
 from richMap.gui_util.command_parser import CommandParser
 from richMap.host_discovery.host_discovery_types import HostDiscoveryTypes
 from richMap.host_discovery.network_discovery_result import NetworkDiscoveryResult
-from richMap.port_scanning.host_result import HostResult
-from richMap.port_scanning.scan_types import ScanTypes
+from richMap.port_scanning.model.host_result import HostResult
+from richMap.port_scanning.model.scan_types import ScanTypes
 from richMap.scan_factories.host_discovery_scan_factory import HostDiscoveryScanFactory
 from richMap.scan_factories.port_scan_factory import PortScanFactory
-from .port_scanning.port_scanner import PortScanner
+from richMap.port_scanning.port_scanner import PortScanner
 from .host_discovery.net_mapper import Netmapper
 
-
+#TODO Rewrite
 class RichGUI(ttk.Frame):
     """Acts as a controller for the rest of GUI and port/net scanners"""
 

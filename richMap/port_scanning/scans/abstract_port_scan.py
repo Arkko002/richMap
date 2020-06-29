@@ -2,12 +2,12 @@ from abc import abstractmethod
 
 from richMap.abstract_base_scan import AbstractBaseScan
 from richMap.port_scanning.model.port_result import PortState
-from richMap.port_scanning.model.response_packet import TcpResponsePacket
-from richMap.port_scanning.model.scan_types import ScanTypes
+from richMap.port_scanning.model.tcp_response_packet import TcpResponsePacket
 from richMap.port_scanning.model.tcp_flags import TcpFlags
 from richMap.util.packet_generator import PacketGenerator
 
 
+# TODO Use bit operations to extract the header fields
 class AbstractPortScan(AbstractBaseScan):
     @abstractmethod
     def get_scan_result(self, target, port, timeout) -> PortState:
@@ -18,23 +18,23 @@ class AbstractPortScan(AbstractBaseScan):
         results = self.soc.send_packet_and_return_result(packet, target, port, timeout)
 
         if results.icmp_res is None and results.soc_res is None:
-            return PortState.Filtered
+            return PortState.NoResponse
 
         if results.icmp_res is not None:
-            if self.__is_destination_unreachable(results.icmp_res):
+            if self._is_destination_unreachable(results.icmp_res):
                 return PortState.Filtered
 
         if results.soc_res is not None:
-            tcp_flags = self.__get_tcp_flags(results.soc_res)
+            tcp_flags = self._get_tcp_flags(results.soc_res)
             tcp_header = PacketGenerator.unpack_tcp_header(results.soc_res)
             return TcpResponsePacket(tcp_flags, tcp_header)
 
-    def __get_tcp_flags(self, packet):
+    def _get_tcp_flags(self, packet):
         tcp_header = PacketGenerator.unpack_tcp_header(packet)
-        return self.__check_tcp_flags(bin(tcp_header[5])[2:])
+        return self._check_tcp_flags(bin(tcp_header[5])[2:])
 
     @staticmethod
-    def __check_tcp_flags(flags_bin):
+    def _check_tcp_flags(flags_bin):
         while len(flags_bin) < 8:
             flags_bin = "0" + flags_bin
 
@@ -45,7 +45,7 @@ class AbstractPortScan(AbstractBaseScan):
         return return_list
 
     @staticmethod
-    def __is_destination_unreachable(icmp_packet):
+    def _is_destination_unreachable(icmp_packet):
         if icmp_packet is not None:
             icmp_header = PacketGenerator.unpack_icmp_header(icmp_packet)
 

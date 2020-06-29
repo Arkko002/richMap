@@ -1,14 +1,14 @@
 import argparse
 import sys
 
-from richMap.host_discovery.model.host_discovery_types import HostDiscoveryTypes
-from richMap.host_discovery.network_discovery_result import NetworkDiscoveryResult
-from richMap.port_scanning.model.scan_types import ScanTypes
-from richMap.factories.host_discovery_scan_factory import HostDiscoveryScanFactory
-from richMap.factories.port_scan_factory import PortScanFactory
+from richMap.host_discovery.host_discoverer import HostDiscoverer
+from richMap.host_discovery.model.host_discovery_types import HostDiscoveryType
+from richMap.host_discovery.model.network_discovery_result import NetworkDiscoveryResult
+from richMap.port_scanning.model.scan_types import ScanType
+from richMap.scan_factories.host_discovery_scan_factory import HostDiscoveryScanFactory
+from richMap.scan_factories.port_scan_factory import PortScanFactory
 from richMap.port_scanning.result_factories.host_result_factory import HostResultFactory
 from richMap.port_scanning.result_factories.port_result_factory import PortResultFactory
-from .host_discovery.net_mapper import Netmapper
 from .port_scanning.port_scanner import PortScanner
 from .console_view import ConsoleView
 
@@ -54,7 +54,7 @@ class RichMap(object):
 
         elif self.arguments.map_type is not None:
             result = self._get_host_discovery_results()
-            self.view.print_net_map_results(result)
+            self.view.print_host_discovery_results(result)
 
         if self.arguments.scan_type is None and self.arguments.map_type is None:
             self.view.print_error("No scan specified")
@@ -62,10 +62,10 @@ class RichMap(object):
     def _get_port_scan_results(self):
         scanner_factory = PortScanFactory()
         scan_type = ScanTypes(self.arguments.scan_type)
+
         scan = scanner_factory.get_scanner(scan_type)
         if scan is str:
             self.view.print_error(scan)
-            
 
         host_result_factory = HostResultFactory()
         port_result_factory = PortResultFactory()
@@ -88,9 +88,8 @@ class RichMap(object):
 
         network_result = NetworkDiscoveryResult(self.arguments.target, host_discovery_type)
 
-        mapper = Netmapper(self.arguments.target, network_result, scan)
+        mapper = HostDiscoverer(self.arguments.target, network_result, scan)
         return mapper.map_network()
-
 
 
 if __name__ == "__main__":

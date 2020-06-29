@@ -7,5 +7,4 @@ class PortState(Enum):
     Filtered = 2,
     Unfiltered = 3,
     OpenFiltered = 4,
-    NoResponse = 5
 

@@ -1,76 +1,38 @@
-from richMap.host_discovery.model.host_discovery_types import HostDiscoveryTypes
-from richMap.port_scanning.model.scan_types import ScanTypes
+import os
+
+from richMap.host_discovery.viewmodel.network_discovery_vm import NetworkDiscoveryViewModel
+from richMap.port_scanning.viewmodel.host_result_vm import HostResultViewModel
+from richMap.util.ansi_sequences import ansi_sequences
 
 
 class ConsoleView:
     def __init__(self, controller):
         self.controller = controller
-        self.scan_types = {
-            ScanTypes.T: "TCP Scan",
-            ScanTypes.S: "SYN Scan",
-            ScanTypes.U: "UDP Scan",
-            ScanTypes.A: "ACK Scan",
-            ScanTypes.F: "FIN Scan",
-            ScanTypes.X: "Xmas Scan",
-            ScanTypes.N: "Null Scan",
-            ScanTypes.M: "Maimon's Scan",
-            ScanTypes.W: "Window Scan"
-        }
 
-        self.map_types = {
-            HostDiscoveryTypes.P: "Ping Scan",
-            HostDiscoveryTypes.A: "ARP Scan",
-            HostDiscoveryTypes.F: "FIN Scan",
-            HostDiscoveryTypes.S: "SYN Scan",
-            HostDiscoveryTypes.N: "Null Scan",
-            HostDiscoveryTypes.I: "ICMP Scan",
-            HostDiscoveryTypes.X: "Xmas Scan"
-        }
-
-    def print_port_scan_results(self, results):
+    def print_port_scan_results(self, host_result_vm: HostResultViewModel):
         """Prints out the results of port scan"""
+        str(host_result_vm)
+        self._print_separator()
 
-        scan_type_enum = ScanTypes[self.controller.arguments.scan_type]
-        scan_type_str = self.scan_types[scan_type_enum]
-        target = self.controller.arguments.target
+        # TODO high and low verbosity
+        for port_result in host_result_vm.port_result_vms:
+            print(str(port_result))
 
-        info = "Performing {0} on {1}".format(scan_type_str, target)
-
-        if not results:
-            print("No ports returned as open")
-            return
-
-        self._print_output(results, info)
-
-    def print_net_map_results(self, results):
+    def print_host_discovery_results(self, network_result_vm: NetworkDiscoveryViewModel):
         """Prints out the results of network mapping"""
+        print(str(network_result_vm))
+        self._print_separator()
 
-        map_type_enum = HostDiscoveryTypes[self.controller.arguments.map]
-        map_type = self.map_types[map_type_enum]
-        target = self.controller.arguments.target
-        interface = self.controller.arguments.net_int
-
-        info = "Performing {0} on {1} ({2})".format(
-            map_type, target, interface)
-
-        if not results:
-            print("No hosts returned as online")
-            return
-
-        self._print_output(results, info)
+        # TODO high and low verbosity
+        for host_result in network_result_vm.host_discovery_results_vms:
+            print(str(host_result))
 
     @staticmethod
     def print_error(failure_message):
-        print("Error: " + failure_message)
+        print(f"{ansi_sequences['error']} {failure_message} {ansi_sequences['end_sequence']}")
 
-    def _print_output(self, results, info):
-        print(info)
-        print("--" * 12)
-
-        if self.controller.arguments.verbosity == 2:
-            for item in results:
-                print(item)
-        else:
-            for item in results:
-                if "Open" in item or "Filtered" in item or "Unfiltered" in item or "Host Up" in item:
-                    print(item)
+    @staticmethod
+    def _print_separator():
+        """ Print separator using the character column width """
+        rows, columns = os.popen("stty size", "r").read().split()
+        print("-" * columns)

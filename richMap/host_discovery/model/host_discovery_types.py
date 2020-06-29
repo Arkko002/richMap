@@ -1,11 +1,11 @@
 from enum import Enum
 
 
-class HostDiscoveryTypes(Enum):
-    P = 0
-    A = 1
-    I = 2
-    S = 3
-    N = 4
-    X = 5
-    F = 6
+class HostDiscoveryType(Enum):
+    Ping = 0
+    Arp = 1
+    Icmp = 2
+    Syn = 3
+    Null = 4
+    Xmas = 5
+    Fin = 6

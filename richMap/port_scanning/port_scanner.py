@@ -12,6 +12,7 @@ class PortScanner(object):
                  port_result_factory: AbstractPortResultFactory):
         if self._check_if_valid_address(target) is False:
             # TODO Error handling
+            pass
 
         self.target = target
         self.scan = scan
@@ -28,16 +29,17 @@ class PortScanner(object):
         Returns HostResult object."""
         port_states = (state for state in self._port_state_generator(self.target, self.port_range, 3.0))
         port_results = (self._port_result_generator(self.current_port, port_state) for port_state in port_states)
-        self.host_result.port_results = port_results
+        self.host_result.port_result_vms = port_results
 
         return self.host_result
 
+    @staticmethod
     def _check_if_valid_address(target):
-        # TODO IPv6 support 
+        # TODO IPv6 support
         r = re.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]"
                        "|25[0-5])$")
 
-        if not r.match(self.target):
+        if not r.match(target):
             return False
 
         return True

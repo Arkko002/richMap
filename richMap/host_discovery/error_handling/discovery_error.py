@@ -1,6 +1,6 @@
-from richMap.error_handling.abstract_error import AbstractError
+from enum import Enum
 
 
-class DiscoveryError(AbstractError):
-    def __init__(self, info_message):
-        super().__init__(info_message)
+class DiscoveryError(Enum):
+    NoError = 0,
+    ConnectionTimedOut = 1

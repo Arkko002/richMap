@@ -2,7 +2,8 @@ import ipaddress
 import re
 
 # TODO ICMP Ping, TCP SYN/Fin/Null/XMAS Ping, UDP Ping, IP Ping, Reverse DNS
-from richMap.host_discovery.network_discovery_result import NetworkDiscoveryResult
+from richMap.host_discovery.model.network_discovery_result import NetworkDiscoveryResult
+from richMap.host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
 
 
 class HostDiscoverer():
@@ -10,6 +11,7 @@ class HostDiscoverer():
 
     def __init__(self, network_ip: str, network_result: NetworkDiscoveryResult, host_discovery: AbstractHostDiscovery):
         if self._check_if_valid_address(network_ip) is False:
+            pass
             # TODO Error handling, probably something better than just returning a string
 
         # TODO IPv6 support
@@ -22,12 +24,13 @@ class HostDiscoverer():
         
         return self.network_result
     
+    @staticmethod
     def _check_if_valid_address(network_ip):
         """Performs a specified type of scan on a given IP range"""
         r = re.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]).){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]"
                        "|25[0-5])$")
 
-        if not r.match(self.network_ip):
+        if not r.match(network_ip):
             return False 
 
         return True

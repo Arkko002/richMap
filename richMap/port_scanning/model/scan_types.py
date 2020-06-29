@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class ScanTypes(Enum):
+class ScanType(Enum):
     T = 0
     S = 1
     U = 2

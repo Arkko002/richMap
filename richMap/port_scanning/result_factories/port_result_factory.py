@@ -4,6 +4,7 @@ from richMap.port_scanning.model.port_state import PortState
 from richMap.port_scanning.result_factories.abstract_port_result_factory import AbstractPortResultFactory
 
 
+# TODO
 class PortResultFactory(AbstractPortResultFactory):
     def get_port_result(self, port, port_state: PortState, error: ScannerError):
         return PortResult(port, port_state, error)

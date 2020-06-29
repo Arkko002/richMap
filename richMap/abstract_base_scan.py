@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from richMap.port_scanning.model.scan_types import ScanTypes
+from richMap.port_scanning.model.scan_types import ScanType
 from richMap.scanner_socket import ScannerSocket
 
 
