@@ -1,5 +1,5 @@
 # TODO
-from richMap.host_discovery.error_handling.discovery_error import DiscoveryError
+from host_discovery.error_handling.discovery_error import DiscoveryError
 
 
 class DiscoveryErrorViewModel:

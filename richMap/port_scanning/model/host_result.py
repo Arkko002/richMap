@@ -1,8 +1,6 @@
-from richMap.port_scanning.model.scan_types import ScanType
-
-
 class HostResult:
-    def __init__(self, target_ip, scan_type: ScanType):
-        self.target_ip = target_ip
-        self.scan_type = scan_type
+    def __init__(self, target, port_range, scan):
+        self.target = target
+        self.port_range = [int(port) for port in port_range.split("-")]
+        self.scan = scan
         self.port_results = []

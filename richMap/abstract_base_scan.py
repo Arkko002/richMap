@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 
-from richMap.port_scanning.model.scan_types import ScanType
-from richMap.scanner_socket import ScannerSocket
+from scanner_socket import ScannerSocket
 
 
 class AbstractBaseScan(ABC):
@@ -12,5 +11,5 @@ class AbstractBaseScan(ABC):
         self.soc.close_sockets()
 
     @abstractmethod
-    def send_probe_packet_and_get_result(self, packet, target, port, timeout):
+    def send_probe_packet(self, packet, target, port, timeout):
         pass

@@ -1,24 +1,21 @@
 import argparse
 import sys
 
-from richMap.host_discovery.host_discoverer import HostDiscoverer
-from richMap.host_discovery.model.host_discovery_types import HostDiscoveryType
-from richMap.host_discovery.model.network_discovery_result import NetworkDiscoveryResult
-from richMap.port_scanning.model.scan_types import ScanType
-from richMap.scan_factories.host_discovery_scan_factory import HostDiscoveryScanFactory
-from richMap.scan_factories.port_scan_factory import PortScanFactory
-from richMap.port_scanning.result_factories.host_result_factory import HostResultFactory
-from richMap.port_scanning.result_factories.port_result_factory import PortResultFactory
-from .port_scanning.port_scanner import PortScanner
-from .console_view import ConsoleView
+from host_discovery.host_discoverer import HostDiscoverer
+from host_discovery.model.host_discovery_types import HostDiscoveryType
+from host_discovery.model.network_discovery_result import NetworkDiscoveryResult
+from factories.host_discovery_scan_factory import HostDiscoveryScanFactory
+from factories.port_scan_factory import PortScanFactory
+from port_scanning.port_scanner import PortScanner
+from console_view import ConsoleView
+from port_scanning.viewmodel.host_result_vm import HostResultViewModel
 
 
-# TODO Add viewmodels
 class RichMap(object):
 
     def __init__(self):
         self.arguments = self._parse_args()
-        self.view = ConsoleView(self)
+        self.view = ConsoleView(self, self.arguments.verbosity)
 
     @staticmethod
     def _parse_args(argv=sys.argv[1:]):
@@ -50,37 +47,30 @@ class RichMap(object):
 
         if self.arguments.scan_type is not None:
             result = self._get_port_scan_results()
-            self.view.print_port_scan_results(result)
+            result_vm = HostResultViewModel(result)
+            self.view.print_results(result_vm)
 
         elif self.arguments.map_type is not None:
             result = self._get_host_discovery_results()
-            self.view.print_host_discovery_results(result)
+            self.view.print_results(result)
 
         if self.arguments.scan_type is None and self.arguments.map_type is None:
             self.view.print_error("No scan specified")
 
     def _get_port_scan_results(self):
         scanner_factory = PortScanFactory()
-        scan_type = ScanTypes(self.arguments.scan_type)
 
-        scan = scanner_factory.get_scanner(scan_type)
+        scan = scanner_factory.get_scanner(self.arguments.scan_type)
         if scan is str:
             self.view.print_error(scan)
 
-        host_result_factory = HostResultFactory()
-        port_result_factory = PortResultFactory()
-
-        scanner = PortScanner(self.arguments.target,
-                              scan,
-                              self.arguments.range,
-                              host_result_factory,
-                              port_result_factory)
+        scanner = PortScanner(self.arguments.target, scan, self.arguments.range,)
 
         return scanner.perform_scan()
 
     def _get_host_discovery_results(self):
         host_discovery_factory = HostDiscoveryScanFactory()
-        host_discovery_type = HostDiscoveryTypes(self.arguments.map_type)
+        host_discovery_type = HostDiscoveryType(self.arguments.map_type)
 
         scan = host_discovery_factory.get_scanner(host_discovery_type)
         if scan is str:

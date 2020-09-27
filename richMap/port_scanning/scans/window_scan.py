@@ -1,20 +1,18 @@
-from richMap.port_scanning.model.port_result import PortState
-from richMap.port_scanning.model.tcp_response_packet import TcpFlags
-from richMap.port_scanning.scans.abstract_port_scan import AbstractPortScan
-from richMap.util.packet_generator import PacketGenerator
+from port_scanning.model.port_result import PortResult, PortState
+from port_scanning.scans.abstract_port_scan import AbstractPortScan
+from scapy.layers.inet import IP, TCP
 
 
 class WindowPortScan(AbstractPortScan):
-    def get_scan_result(self, target, port, timeout) -> PortState:
-        packet = PacketGenerator.generate_tcp_header(port, ack=1)
-        result = super().send_probe_packet_and_get_result(packet, target, port, 3.0)
+    def get_scan_result(self, target, port, timeout) -> PortResult:
+        packet = IP(target) / TCP(dport=[80, port], flags="A")
+        result = super().send_probe_packet(packet, target, port, 3.0)
 
         if result is PortState:
-            return result
+            return PortResult(port, result, False)
 
-        if TcpFlags.RST in result.tcp_flags:
-            window_size = result.get_window_size()
-            if window_size > 0:
-                return PortState.Open
-            elif window_size == 0:
-                return PortState.Closed
+        if result[TCP].flags.R:
+            if result[TCP].window > 0:
+                return PortResult(port, PortState.Open, True)
+            elif result[TCP].window == 0:
+                return PortResult(port, PortState.Closed, False)

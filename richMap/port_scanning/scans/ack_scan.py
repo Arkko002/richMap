@@ -1,16 +1,15 @@
-from richMap.port_scanning.model.port_result import PortState
-from richMap.port_scanning.model.tcp_flags import TcpFlags
-from richMap.port_scanning.scans.abstract_port_scan import AbstractPortScan
-from richMap.util.packet_generator import PacketGenerator
+from port_scanning.model.port_result import PortResult, PortState
+from port_scanning.scans.abstract_port_scan import AbstractPortScan
+from scapy.layers.inet import IP, TCP
 
 
 class AckPortScan(AbstractPortScan):
-    def get_scan_result(self, target, port, timeout) -> PortState:
-        packet = PacketGenerator.generate_tcp_header(port, ack=1)
-        result = super().send_probe_packet_and_get_result(packet, target, port, timeout)
+    def get_scan_result(self, target, port, timeout) -> PortResult:
+        packet = IP(dst=target) / TCP(dport=[80, port], flags="A")
+        result = super().send_probe_packet(packet, target, port, timeout)
 
         if result is PortState:
-            return result
+            return PortResult(port, result, False)
 
-        if TcpFlags.RST in result.tcp_flags:
-            return PortState.Unfiltered
+        if result[TCP].flags.F:
+            return PortResult(port, PortState.Unfiltered, True)

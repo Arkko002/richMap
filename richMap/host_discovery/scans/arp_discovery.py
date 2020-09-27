@@ -1,6 +1,5 @@
-from richMap.host_discovery.host_discovery_result import HostDiscoveryResult
-from richMap.host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
-from richMap.util.packet_generator import PacketGenerator
+from host_discovery.model.host_discovery_result import HostDiscoveryResult
+from host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
 
 
 # TODO

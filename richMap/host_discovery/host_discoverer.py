@@ -2,11 +2,11 @@ import ipaddress
 import re
 
 # TODO ICMP Ping, TCP SYN/Fin/Null/XMAS Ping, UDP Ping, IP Ping, Reverse DNS
-from richMap.host_discovery.model.network_discovery_result import NetworkDiscoveryResult
-from richMap.host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
+from host_discovery.model.network_discovery_result import NetworkDiscoveryResult
+from host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
 
 
-class HostDiscoverer():
+class HostDiscoverer:
     """Used to discover live hosts on the network"""
 
     def __init__(self, network_ip: str, network_result: NetworkDiscoveryResult, host_discovery: AbstractHostDiscovery):

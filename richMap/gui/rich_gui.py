@@ -1,17 +1,18 @@
 from tkinter import *
 from tkinter import ttk
 
-from richMap.gui_util.command_parser import CommandParser
-from richMap.host_discovery.host_discovery_types import HostDiscoveryTypes
-from richMap.host_discovery.network_discovery_result import NetworkDiscoveryResult
-from richMap.port_scanning.model.host_result import HostResult
-from richMap.port_scanning.model.scan_types import ScanTypes
-from richMap.scan_factories.host_discovery_scan_factory import HostDiscoveryScanFactory
-from richMap.scan_factories.port_scan_factory import PortScanFactory
-from richMap.port_scanning.port_scanner import PortScanner
+from gui.gui_util.command_parser import CommandParser
+from host_discovery.host_discovery_types import HostDiscoveryTypes
+from host_discovery.network_discovery_result import NetworkDiscoveryResult
+from port_scanning.model.host_result import HostResult
+from port_scanning.model.scan_types import ScanType
+from factories.host_discovery_scan_factory import HostDiscoveryScanFactory
+from factories.port_scan_factory import PortScanFactory
+from port_scanning.port_scanner import PortScanner
 from .host_discovery.net_mapper import Netmapper
 
-#TODO Rewrite
+
+# TODO Rewrite
 class RichGUI(ttk.Frame):
     """Acts as a controller for the rest of GUI and port/net scanners"""
 
@@ -98,7 +99,6 @@ class InputsFrame(ttk.Frame):
         self.verbosity_combobox.grid(column=5, row=1)
 
     def add_scan_to_cmd_entry(self):
-
         scan_types = {
             "Ping Scan": "-mP",
             "ARP Scan": "-mA",
