@@ -1,5 +1,4 @@
 import socket
-from collections import namedtuple
 
 from factories.socket_factory import SocketFactory
 from factories.socket_type import SocketType
@@ -12,6 +11,8 @@ class ScannerSocket:
 
         self.soc = soc_factory.create_socket(socket_type)
         self.icmp_soc = soc_factory.create_socket(socket_type.ICMP)
+        self.default_soc_timeout = socket.getdefaulttimeout()
+        self.packet_dict = {}
 
     def try_connecting_to_port(self, send_probe_packet, port):
         """ Tries to connect to port with TCP socket and returns true on success.
@@ -28,8 +29,10 @@ class ScannerSocket:
         self.soc.close()
         self.icmp_soc.close()
 
-    def send_probe_packet(self, packet, target, port, timeout):
+    def send_probe_packet(self, packet, target, port, timeout=None):
         """Sends the probe packet, returns the response packets or None in case of no response"""
+        if timeout is None:
+            timeout = self.default_soc_timeout
 
         self.soc.settimeout(timeout)
         self.icmp_soc.settimeout(timeout)
@@ -40,9 +43,11 @@ class ScannerSocket:
             tcp_result = self._await_response(self.soc)
             icmp_result = self._await_response(self.icmp_soc)
 
-            if tcp_result is not None or icmp_result is not None:
-                SocketResponses = namedtuple('Responses', ['tcp_res', "icmp_res"])
-                return SocketResponses(tcp_result, icmp_result)
+            if tcp_result is not None:
+                self.packet_dict[port] = tcp_result
+
+            if icmp_result is not None:
+                self.packet_dict[port] = icmp_result
 
     # TODO Thread for each socket
     @staticmethod
