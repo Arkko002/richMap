@@ -8,12 +8,12 @@ from scapy.layers.inet import TCP
 
 class AbstractPortScan(AbstractBaseScan):
     @abstractmethod
-    def get_scan_result(self, target, ports, timeout) -> PortResult:
+    def get_scan_result(self, target, port, timeout) -> PortResult:
         pass
 
-    def send_probe_packets(self, packet, target, ports, timeout=None):
+    def send_probe_packet(self, packet, target, port, timeout):
         """Sends probe packet, returns PortState if probe failed, otherwise returns TCP packet"""
-        results = self.soc.send_probe_packet(packet, target, ports, timeout)
+        results = self.soc.send_probe_packet(packet, target, port, timeout)
 
         result_error = self.check_probe_errors(results)
         if result_error is not None:

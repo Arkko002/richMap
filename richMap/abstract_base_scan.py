@@ -11,5 +11,5 @@ class AbstractBaseScan(ABC):
         self.soc.close_sockets()
 
     @abstractmethod
-    def send_probe_packet(self, packet, target, port, timeout=None):
+    def send_probe_packet(self, packet, target, port, timeout):
         pass
