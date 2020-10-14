@@ -6,7 +6,7 @@ from port_scanning.scans.null_scan import NullPortScan
 from port_scanning.scans.window_scan import WindowPortScan
 from port_scanning.scans.xmas_scan import XmasPortScan
 from port_scanning.viewmodel.port_result_wm import PortResultViewModel
-from port_scanning.scans.syn_scan import SynPortScan
+# TODO from port_scanning.scans.syn_scan import SynPortScan
 from port_scanning.scans.tcp_scan import TcpPortScan
 
 
@@ -25,7 +25,7 @@ class HostResultViewModel:
     def _convert_scan_type_to_str(scan_type):
         scan_type_switcher = {
             TcpPortScan: "TCP Scan",
-            SynPortScan: "SYN Scan",
+            #SynPortScan: "SYN Scan",
             AckPortScan: "ACK Scan",
             FinPortScan: "FIN Scan",
             XmasPortScan: "Xmas Scan",

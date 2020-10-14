@@ -6,7 +6,7 @@ from scapy.layers.inet import IP, TCP
 class XmasPortScan(AbstractPortScan):
     def get_scan_result(self, target, port, timeout) -> PortResult:
         packet = IP(target) / TCP(dport=[80, port], flags="FUP")
-        result = super().send_probe_packet(packet, target, port, 3.0)
+        result = super().send_probe_packet(packet, target, port, timeout)
 
         if result is PortState.NoResponse:
             return PortResult(port, PortState.Open, True)
