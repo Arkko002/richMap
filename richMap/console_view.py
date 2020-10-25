@@ -6,8 +6,7 @@ from util.ansi_sequences import ansi_sequences
 
 # TODO Verbosity, check for verbosity on each print then act accordingly, all info and debug messages sent from model to view
 class ConsoleView:
-    def __init__(self, controller, verbosity):
-        self.controller = controller
+    def __init__(self, verbosity):
         self.verbosity = verbosity
 
     def print_results(self, result_object_vm: HostResultViewModel):
@@ -17,7 +16,8 @@ class ConsoleView:
 
         # TODO high and low verbosity
         for result in result_object_vm.result_vms:
-            print(str(result))
+            if result.result_positive:
+                print(str(result))
 
     @staticmethod
     def print_error(failure_message):

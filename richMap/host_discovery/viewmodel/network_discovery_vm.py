@@ -1,6 +1,5 @@
 from host_discovery.model.host_discovery_types import HostDiscoveryType
 from host_discovery.model.network_discovery_result import NetworkDiscoveryResult
-from host_discovery.viewmodel.host_discovery_wm import HostDiscoveryViewModel
 
 
 class NetworkDiscoveryViewModel:

@@ -46,7 +46,7 @@ class RichGUI(ttk.Frame):
 
         if "-s" in commands:
             port_scan_factory = PortScanFactory()
-            scan = port_scan_factory.get_scanner(commands_dict["s"])
+            scan = port_scan_factory.get_scanner(commands_dict["s"], )
             scan_type = ScanTypes(commands_dict["s"])
 
             host_result = HostResult(target, scan_type)

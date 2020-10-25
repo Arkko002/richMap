@@ -1,9 +1,12 @@
 import click
 
+from console_view import ConsoleView
 from factories.host_discovery_scan_factory import HostDiscoveryScanFactory
 from factories.port_scan_factory import PortScanFactory
 from host_discovery.host_discoverer import HostDiscoverer
 from port_scanning.port_scanner import PortScanner
+from port_scanning.threaded_port_scanner import ThreadedPortScanner
+from port_scanning.viewmodel.host_result_vm import HostResultViewModel
 
 
 @click.command()
@@ -11,7 +14,7 @@ from port_scanning.port_scanner import PortScanner
               type=click.Choice(["mA", "mF", "mI", "mN", "mP", "mS", "mX"]),
               help="Discovery method to be used")
 @click.option("--target", required=True, type=str, help="IP of targeted network")
-@click.option("--verbosity", required=False, type=int)
+@click.option("--verbosity", default=0, required=False, type=int)
 def host_discovery(target, scan):
     host_discovery_factory = HostDiscoveryScanFactory()
     scan_obj = host_discovery_factory.get_scanner(scan)
@@ -21,18 +24,22 @@ def host_discovery(target, scan):
 
 
 @click.command()
-@click.option("--ports", default="0-1023",
-              type=click.IntRange(0, 65535, clamp=True),
+@click.option("--ports", default="0-1023", type=str,
               help="Range of scanned ports separated with \"-\"")
 @click.option("--scan", required=True,
-              type=click.Choice(["sT", "sA", "sF", "sM", "sN", "sX", "sW"]),
+              type=click.Choice(["T", "A", "F", "M", "N", "X", "W"]),
               help="Scan method to be used")
 @click.option("--target", required=True, type=str, help="IP of targeted host")
-@click.option("--verbosity", required=False, type=int)
-def port_scan(target, ports, scan):
+@click.option("--verbosity", default=0, required=False, type=int)
+def port_scan(target, ports, scan, verbosity):
     scanner_factory = PortScanFactory()
-    scan_obj = scanner_factory.get_scanner(scan)
+    scan_obj = scanner_factory.get_scanner(scan, )
 
     scanner = PortScanner(target, scan_obj, ports)
+    console_view = ConsoleView(verbosity)
 
-    return scanner.perform_scan()
+    results = scanner.perform_scan()
+    results_vm = HostResultViewModel(results)
+    console_view.print_results(results_vm)
+
+

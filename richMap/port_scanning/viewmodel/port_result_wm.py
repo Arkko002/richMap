@@ -16,6 +16,7 @@ class PortResultViewModel:
     @staticmethod
     def __convert_port_state_to_str(port_state: PortState):
         port_state_switcher = {
+            PortState.NoResponse: "No Response",
             PortState.Closed: "Closed",
             PortState.Open: "Open",
             PortState.Filtered: "Filtered",
