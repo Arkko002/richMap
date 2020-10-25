@@ -9,7 +9,8 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "richmap = rich_map_click:cli"
+            "scan = rich_map:port_scan",
+            "discover = rich_map:host_discovery"
         ]
     }
 )
