@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
-from scanner_socket import ScannerSocket
+from scanner_socket.scanner_socket import ScannerSocket
 
 
 class AbstractBaseScan(ABC):
@@ -10,5 +10,5 @@ class AbstractBaseScan(ABC):
     def __del__(self):
         self.soc.close_sockets()
 
-    def send_probe_packet(self, packet, target, port, timeout=None):
+    def send_probe_packet(self, packet, target, port):
         pass

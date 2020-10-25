@@ -7,9 +7,9 @@ from scapy.layers.inet import IP, TCP
 class FinPortScan(AbstractPortScan):
     def get_scan_result(self, target, port, timeout) -> PortResult:
         packet = IP(target) / TCP(dport=[80, port], flags="F")
-        result = super().send_probe_packet(packet, target, port, timeout)
+        result = super().send_probe_packet(packet, target, port)
 
-        if result is PortState.NoResponse:
+        if isinstance(result, PortState):
             return PortResult(port, PortState.Open, True)
 
         if result[TCP].flags.R:

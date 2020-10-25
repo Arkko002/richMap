@@ -9,23 +9,17 @@ class PortScanner(object):
             pass
 
         self.host_result = HostResult(target, port_range, scan)
-        self.current_port = self.host_result.port_range[0]
-        
+        self.target = target
+
     def perform_scan(self):
         """Performs a scans on target with parameters provided on object initialization.
         Returns HostResult object."""
 
-        port_results = (result for result in self._port_result_generator(self.host_result.target,
-                                                                         self.host_result.port_range, 3.0))
-        self.host_result.port_results = port_results
+        for port in range(self.host_result.port_range[0], self.host_result.port_range[1] + 1):
+            self.host_result.port_results.append(self.host_result.scan.get_scan_result(self.target, port, 3.0))
 
         return self.host_result
 
     @staticmethod
     def _check_if_valid_address(target):
         return verify_ipv4(target) or verify_ipv6(target)
-
-    def _port_result_generator(self, target, port_range, timeout):
-        for port in range(port_range[0], port_range[1]):
-            self.current_port = port
-            yield self.host_result.scan.get_scan_result(target, port, timeout)

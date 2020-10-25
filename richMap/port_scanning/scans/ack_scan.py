@@ -5,10 +5,10 @@ from scapy.layers.inet import IP, TCP
 
 class AckPortScan(AbstractPortScan):
     def get_scan_result(self, target, port, timeout) -> PortResult:
-        packet = IP(dst=target) / TCP(dport=[80, port], flags="A")
-        result = super().send_probe_packet(packet, target, port, timeout)
+        packet = IP(dst=target) / TCP(dport=port, sport=80, flags="A")
+        result = super().send_probe_packet(packet, target, port)
 
-        if result is PortState:
+        if isinstance(result, PortState):
             return PortResult(port, result, False)
 
         if result[TCP].flags.F:

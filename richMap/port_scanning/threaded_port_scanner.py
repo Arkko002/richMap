@@ -1,9 +1,9 @@
-from queue import Queue
 import concurrent.futures
+from itertools import repeat
 
 from port_scanning.port_scanner import PortScanner
 
-
+# Socket Multithreading is bugged, doesnt recognize packet streams
 class ThreadedPortScanner(PortScanner):
     def __init__(self, target, scan, port_range):
         super().__init__(target, scan, port_range)
@@ -14,10 +14,8 @@ class ThreadedPortScanner(PortScanner):
         return self.host_result
 
     def _start_threads(self):
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
             futures = [executor.submit(self.host_result.scan.get_scan_result,
-                                       self.host_result.target,
-                                       [i for i in
-                                        range(self.host_result.port_range[0], self.host_result.port_range[1] + 1)],
-                                       None)]
+                                       self.target, port, None) for port in range(self.host_result.port_range[1] + 1)]
+
         return futures
