@@ -30,12 +30,13 @@ def host_discovery(target, scan):
               type=click.Choice(["T", "A", "F", "M", "N", "X", "W"]),
               help="Scan method to be used")
 @click.option("--target", required=True, type=str, help="IP of targeted host")
+@click.option("--banners", required=False, type=bool, default=False)
 @click.option("--verbosity", default=0, required=False, type=int)
-def port_scan(target, ports, scan, verbosity):
+def port_scan(target, ports, scan, banners, verbosity):
     scanner_factory = PortScanFactory()
-    scan_obj = scanner_factory.get_scanner(scan, )
+    scan_obj = scanner_factory.get_scanner(scan)
 
-    scanner = PortScanner(target, scan_obj, ports)
+    scanner = PortScanner(target, scan_obj, ports, banners)
     console_view = ConsoleView(verbosity)
 
     results = scanner.perform_scan()

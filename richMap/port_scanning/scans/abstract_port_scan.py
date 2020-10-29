@@ -5,9 +5,12 @@ from port_scanning.model.port_result import PortResult
 from port_scanning.model.port_state import PortState
 from scapy.layers.inet import TCP
 
+from port_scanning.scans.grabber_decorator import grabber_decorator
+
 
 class AbstractPortScan(AbstractBaseScan):
     @abstractmethod
+    @grabber_decorator
     def get_scan_result(self, target, port, timeout) -> PortResult:
         pass
 
