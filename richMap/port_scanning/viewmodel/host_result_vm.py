@@ -11,7 +11,12 @@ from port_scanning.scans.tcp_scan import TcpPortScan
 
 
 class HostResultViewModel:
+    """Converts HostResult data into formatting suitable for display"""
     def __init__(self, host_result: HostResult):
+        """
+
+        :param host_result: Source HostResult object
+        """
         self.model_host_result = host_result
 
         self.target_str = "Target IP: " + host_result.target

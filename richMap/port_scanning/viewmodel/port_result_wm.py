@@ -4,7 +4,12 @@ from port_scanning.model.port_state import PortState
 
 # TODO Filtering the results based on rules from each scan
 class PortResultViewModel:
+    """Converts PortResult data into formatting suitable for display"""
     def __init__(self, port_result: PortResult):
+        """
+
+        :param port_result: Source PortResult object
+        """
         self.port = port_result.port
         self.port_state = port_result.port_state
         self.port_state_str = self.__convert_port_state_to_str(port_result.port_state)

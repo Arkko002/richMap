@@ -7,21 +7,43 @@ from scapy.layers.inet import TCP
 
 
 class AbstractPortScan(AbstractBaseScan):
+    """Defines common operations used by port scan techniques"""
     @abstractmethod
-    def get_scan_result(self, target, port, timeout) -> PortResult:
+    def get_scan_result(self, target, port, timeout: float) -> PortResult:
+        """
+        Returns the result of scanning the specified port
+
+        :param target: IP of the targeted host
+        :param port: Targeted port
+        :param timeout: Timeout value for probe packets
+        """
         pass
 
     def send_probe_packet(self, packet, target, port):
-        """Sends probe packet, returns PortState if probe failed, otherwise returns TCP packet"""
+        """
+        Sends the probe packet and validates return value.
+
+        :param packet: Probe packet to be sent
+        :param target: IP of the targeted host
+        :param port: Targeted port
+        :return: Result packet on success, or PortState describing the error on failure.
+        """
         results = self.soc.send_probe_packet(packet, target, port)
 
-        result_error = self.check_probe_errors(results)
+        result_error = self._check_probe_errors(results)
         if result_error is not None:
             return result_error
 
         return results
 
-    def check_probe_errors(self, results):
+    @staticmethod
+    def _check_probe_errors(results):
+        """
+        Checks the result of probing for errors.
+
+        :param results: Result returned by ScannerSocket
+        :return: PortState describing the error, or None if no errors are detected
+        """
         if results is None:
             return PortState.NoResponse
 
