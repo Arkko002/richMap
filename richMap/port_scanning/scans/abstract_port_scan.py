@@ -7,7 +7,7 @@ from scapy.layers.inet import TCP
 
 
 class AbstractPortScan(AbstractBaseScan):
-    """Defines common operations used by port scan techniques"""
+    """Defines common operations used by port scanning techniques"""
     @abstractmethod
     def get_scan_result(self, target, port, timeout: float) -> PortResult:
         """

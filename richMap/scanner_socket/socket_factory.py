@@ -1,9 +1,10 @@
 import os
 import socket
-from factories.socket_type import SocketType
+from scanner_socket.socket_type import SocketType
 
 
 class SocketFactory:
+    """"""
     def create_socket(self, soc_type: SocketType):
         if soc_type == SocketType.TCPRaw and os.getuid() != 0:
             # TODO User string errors

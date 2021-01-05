@@ -1,10 +1,9 @@
 import socket
-from collections import namedtuple
 
 from scapy.layers.inet import TCP, ICMP
 
-from factories.socket_factory import SocketFactory
-from factories.socket_type import SocketType
+from scanner_socket.socket_factory import SocketFactory
+from scanner_socket.socket_type import SocketType
 
 
 # TODO Validation method for ICMP packets, make sure they are responses to our TCP probing

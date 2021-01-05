@@ -5,9 +5,8 @@ from gui.gui_util.command_parser import CommandParser
 from host_discovery.host_discovery_types import HostDiscoveryTypes
 from host_discovery.network_discovery_result import NetworkDiscoveryResult
 from port_scanning.model.host_result import HostResult
-from port_scanning.model.scan_types import ScanType
-from factories.host_discovery_scan_factory import HostDiscoveryScanFactory
-from factories.port_scan_factory import PortScanFactory
+from host_discovery.scans.host_discovery_scan_factory import HostDiscoveryScanFactory
+from port_scanning.scans.port_scan_factory import PortScanFactory
 from port_scanning.port_scanner import PortScanner
 from .host_discovery.net_mapper import Netmapper
 
