@@ -11,7 +11,7 @@ from port_scanning.viewmodel.host_result_vm import HostResultViewModel
 
 @click.command()
 @click.option("--map", required=True,
-              type=click.Choice(["mA", "mF", "mI", "mN", "mP", "mS", "mX"]),
+              type=click.Choice(["A", "F", "I", "N", "P", "S", "X"]),
               help="Discovery method to be used")
 @click.option("--target", required=True, type=str, help="IP of targeted network")
 @click.option("--verbosity", default=0, required=False, type=int)
@@ -24,7 +24,7 @@ def host_discovery(target, scan):
 
 
 @click.command()
-@click.option("--ports", default="0-1023", type=str,
+@click.option("--ports", default="1-1024", type=str,
               help="Range of scanned ports separated with \"-\"")
 @click.option("--scan", required=True,
               type=click.Choice(["T", "A", "F", "M", "N", "X", "W"]),
