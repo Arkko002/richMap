@@ -1,6 +1,6 @@
 from port_scanning.model.port_result import PortResult, PortState
 from port_scanning.scans.abstract_port_scan import AbstractPortScan
-from scapy.all import IP, TCP
+from scapy.layers.inet import IP, TCP
 
 
 class NullPortScan(AbstractPortScan):
