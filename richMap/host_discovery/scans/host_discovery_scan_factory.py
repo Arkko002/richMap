@@ -1,6 +1,5 @@
 from host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
 from host_discovery.scans.arp_discovery import ArpDiscovery
-from host_discovery.scans.icmp_discovery import IcmpDiscovery
 from host_discovery.scans.ping_discovery import PingDiscovery
 from host_discovery.scans.syn_discovery import SynDiscovery
 from abstract_scanner_factory import AbstractScannerFactory
@@ -20,13 +19,11 @@ class HostDiscoveryScanFactory(AbstractScannerFactory):
         host_discovery = {
             "P": PingDiscovery,
             "A": ArpDiscovery,
-            "I": IcmpDiscovery,
             "S": SynDiscovery
         }
 
-        # TODO Proper error handling
         if scanner_type not in host_discovery:
-            return "Wrong scan type specified"
+            raise KeyError
 
         if scanner_type == "I":
             soc = ScannerSocket(SocketType.ICMP)

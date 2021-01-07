@@ -1,3 +1,4 @@
+from exceptions.invalid_ip import InvalidIPError
 from port_scanning.scans.abstract_port_scan import AbstractPortScan
 from util.ip_util import verify_ipv4, verify_ipv6
 from port_scanning.model.host_result import HostResult
@@ -13,8 +14,7 @@ class PortScanner:
         :param port_range: Range of ports to be scanned separated with "-"
         """
         if self._check_if_valid_address(target) is False:
-            # TODO Error handling
-            pass
+            raise InvalidIPError(target)
 
         self.host_result = HostResult(target, port_range, scan)
         self.target = target

@@ -7,8 +7,7 @@ class SocketFactory:
     """"""
     def create_socket(self, soc_type: SocketType):
         if soc_type == SocketType.TCPRaw and os.getuid() != 0:
-            # TODO User string errors
-            return None
+            raise PermissionError
 
         socket_switcher = {
             soc_type.TCP: self._get_tcp_socket(),
