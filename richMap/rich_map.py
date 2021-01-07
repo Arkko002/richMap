@@ -1,7 +1,9 @@
 import click
 
 from console_view import ConsoleView
+from exceptions.invalid_ip import InvalidIPError
 from host_discovery.scans.host_discovery_scan_factory import HostDiscoveryScanFactory
+from host_discovery.viewmodel.network_discovery_vm import NetworkDiscoveryViewModel
 from port_scanning.scans.port_scan_factory import PortScanFactory
 from host_discovery.host_discoverer import HostDiscoverer
 from port_scanning.port_scanner import PortScanner
@@ -14,12 +16,24 @@ from port_scanning.viewmodel.host_result_vm import HostResultViewModel
               help="Discovery method to be used")
 @click.option("--target", required=True, type=str, help="IP of targeted network")
 @click.option("--verbosity", default=0, required=False, type=int)
-def host_discovery(target, scan):
+def host_discovery(target, scan, verbosity):
     host_discovery_factory = HostDiscoveryScanFactory()
     scan_obj = host_discovery_factory.get_scanner(scan)
 
     mapper = HostDiscoverer(target, scan_obj)
-    return mapper.map_network()
+    console_view = ConsoleView(verbosity)
+
+    try:
+        results = mapper.map_network()
+    except PermissionError:
+        console_view.print_error("Root privileges required for the selected discovery method.")
+        return
+    except InvalidIPError:
+        console_view.print_error(f"{target} is not a valid IP address.")
+        return
+
+    results_vm = NetworkDiscoveryViewModel(results)
+    console_view.print_results(results_vm)
 
 
 @click.command()
@@ -37,7 +51,15 @@ def port_scan(target, ports, scan, verbosity):
     scanner = PortScanner(target, scan_obj, ports)
     console_view = ConsoleView(verbosity)
 
-    results = scanner.perform_scan()
+    try:
+        results = scanner.perform_scan()
+    except PermissionError:
+        console_view.print_error("Root privileges required for the selected scan method.")
+        return
+    except InvalidIPError:
+        console_view.print_error(f"{target} is not a valid IP address.")
+        return
+
     results_vm = HostResultViewModel(results)
     console_view.print_results(results_vm)
 
