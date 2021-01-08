@@ -1,7 +1,13 @@
 language: python
-python: 3.8
-
+python: 3.9
 install:
   - pip install -r requirements.txt
 
 script: python -m unittest
+deploy:
+  provider: pypi
+  username: __token__
+  password:
+    secure: JBh1N6+SOOSamAc9jmdtPcloVgdjjKjSDenBSCL6rsblzKT8srJp20xd8/gvU5iH1ljajMRwDbAKn2IZXXhjFpwLcWt2qwN1aUlvlPUSovGTd4BohzLW6ljEJy75NCuyduwnO+c/VPKwtM3WD4oLpuwDt8CIH749WXDTvyz7zZdf7juGMhpaID0Y4uuLCARmfx0DLOxdwmRc03xTqVSKrqC7vYLdJT7OTGaYDPREcX7Pkly1+fB1ovi03iphO/Rb0G9SUt5qywcx02NGPaC0QhAFYW754X9Eaq/ST/Cvl1Vcko2/M+yT6534vyiSydlwWnQGZTghTHREJw+vwUTQrMHC/B8wg80dznldQW7dmjvkz/pKYBog78c0qvHwxY0J129bQgq8ADxLR6Zn82q2bYIPO6c+nD3lUgPyT38v2afIS63Kv0fo2HoKKy9hotacMI8A6koti3MUPU2SrLKJnwKjk+8QJA4aEvtjN7o3h7n8+Aj/vrd1vqMudU+0vgcdi2YMMWbUGEw0aM4EgfzCM4Jh2kIXrhFkmamFOCS1magEZzTYJqKCh5fIHqyS+fcmfnu7hmZs9psOi4xgdN+3Gc4Q1eTh/SNDwTWGfVK+2NGvU4wrrgm2duLBQuRWS+OLn7OwogLQ8msm/hs+3f8e8E6BvISX0MRFqk/1PJpNlXQ=
+  on:
+    branch: master
