@@ -32,7 +32,7 @@ functionality, although `TCP scan` and `Ping discovery` can be used without root
 ### Installation
 Latest version of RichMap is hosted on PyPI. You can install it with:
 
-```pip install -g richmap```
+```pip install richmap```
 
 This will install RichMap globally.
 
