@@ -1,4 +1,4 @@
-from port_scanning.error_handling.scanner_error import ScannerError
+from richMap.port_scanning.error_handling.scanner_error import ScannerError
 
 
 class ScannerErrorViewModel():

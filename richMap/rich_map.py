@@ -1,13 +1,13 @@
 import click
 
-from console_view import ConsoleView
-from exceptions.invalid_ip import InvalidIPError
-from host_discovery.scans.host_discovery_scan_factory import HostDiscoveryScanFactory
-from host_discovery.viewmodel.network_discovery_vm import NetworkDiscoveryViewModel
-from port_scanning.scans.port_scan_factory import PortScanFactory
-from host_discovery.host_discoverer import HostDiscoverer
-from port_scanning.port_scanner import PortScanner
-from port_scanning.viewmodel.host_result_vm import HostResultViewModel
+from richMap.console_view import ConsoleView
+from richMap.exceptions.invalid_ip import InvalidIPError
+from richMap.host_discovery.scans.host_discovery_scan_factory import HostDiscoveryScanFactory
+from richMap.host_discovery.viewmodel.network_discovery_vm import NetworkDiscoveryViewModel
+from richMap.port_scanning.scans.port_scan_factory import PortScanFactory
+from richMap.host_discovery.host_discoverer import HostDiscoverer
+from richMap.port_scanning.port_scanner import PortScanner
+from richMap.port_scanning.viewmodel.host_result_vm import HostResultViewModel
 
 
 @click.command()

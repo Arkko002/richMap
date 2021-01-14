@@ -8,7 +8,7 @@ from port_scanning.model.host_result import HostResult
 from host_discovery.scans.host_discovery_scan_factory import HostDiscoveryScanFactory
 from port_scanning.scans.port_scan_factory import PortScanFactory
 from port_scanning.port_scanner import PortScanner
-from .host_discovery.net_mapper import Netmapper
+from host_discovery.net_mapper import Netmapper
 
 
 # TODO Rewrite

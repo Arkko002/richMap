@@ -1,8 +1,8 @@
 from abc import abstractmethod
 
-from abstract_base_scan import AbstractBaseScan
-from port_scanning.model.port_result import PortResult
-from port_scanning.model.port_state import PortState
+from richMap.abstract_base_scan import AbstractBaseScan
+from richMap.port_scanning.model.port_result import PortResult
+from richMap.port_scanning.model.port_state import PortState
 from scapy.layers.inet import TCP
 
 

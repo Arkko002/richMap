@@ -1,6 +1,3 @@
-from host_discovery.error_handling.discovery_error import DiscoveryError
-
-
 class HostDiscoveryResult:
     """Contains information of an attempt to contact an IP address on the targeted network"""
     def __init__(self, ip, host_online: bool):

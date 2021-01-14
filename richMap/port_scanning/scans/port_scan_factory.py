@@ -1,14 +1,14 @@
-from port_scanning.scans.abstract_port_scan import AbstractPortScan
-from port_scanning.scans.ack_scan import AckPortScan
-from port_scanning.scans.fin_scan import FinPortScan
-from port_scanning.scans.maimon_scan import MaimonPortScan
-from port_scanning.scans.null_scan import NullPortScan
-from port_scanning.scans.tcp_scan import TcpPortScan
-from port_scanning.scans.window_scan import WindowPortScan
-from port_scanning.scans.xmas_scan import XmasPortScan
-from abstract_scanner_factory import AbstractScannerFactory
-from scanner_socket.socket_type import SocketType
-from scanner_socket.threaded_scanner_socket import ThreadedScannerSocket
+from richMap.port_scanning.scans.abstract_port_scan import AbstractPortScan
+from richMap.port_scanning.scans.ack_scan import AckPortScan
+from richMap.port_scanning.scans.fin_scan import FinPortScan
+from richMap.port_scanning.scans.maimon_scan import MaimonPortScan
+from richMap.port_scanning.scans.null_scan import NullPortScan
+from richMap.port_scanning.scans.tcp_scan import TcpPortScan
+from richMap.port_scanning.scans.window_scan import WindowPortScan
+from richMap.port_scanning.scans.xmas_scan import XmasPortScan
+from richMap.abstract_scanner_factory import AbstractScannerFactory
+from richMap.scanner_socket.socket_type import SocketType
+from richMap.scanner_socket.threaded_scanner_socket import ThreadedScannerSocket
 
 class PortScanFactory(AbstractScannerFactory):
     """Translates the CLI commands into objects that inherit from AbstractPortScan"""

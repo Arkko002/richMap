@@ -1,4 +1,4 @@
-from host_discovery.model.host_discovery_result import HostDiscoveryResult
+from richMap.host_discovery.model.host_discovery_result import HostDiscoveryResult
 
 
 class HostDiscoveryViewModel:

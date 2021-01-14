@@ -2,8 +2,8 @@ import socket
 
 from scapy.layers.inet import TCP, ICMP
 
-from scanner_socket.socket_factory import SocketFactory
-from scanner_socket.socket_type import SocketType
+from richMap.scanner_socket.socket_factory import SocketFactory
+from richMap.scanner_socket.socket_type import SocketType
 
 
 # TODO Validation method for ICMP packets, make sure they are responses to our TCP probing
@@ -53,19 +53,17 @@ class ScannerSocket:
         self.soc.close()
         self.icmp_soc.close()
 
-    def send_probe_packet(self, packet, target, port):
+    def send_probe_packet(self, packet):
         """
         Sends the probe packet and returns the result packet on success.
         In case of a timeout retries sending the probe several more times.
         Returns None after several timeouts.
 
         :param packet: Probe packet to be sent
-        :param target: IP of the targeted host
-        :param port: Targeted Port
         :return: Result packet on success, None on failure
         """
         for i in range(3):
-            self.soc.sendto(bytes(packet), (target, port))
+            self.soc.send(bytes(packet))
 
             tcp_result = self._await_response(self.soc)
             icmp_result = self._await_response(self.icmp_soc)

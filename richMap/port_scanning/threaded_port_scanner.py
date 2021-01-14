@@ -1,8 +1,8 @@
 import concurrent.futures
 from asyncio import Future
 
-from port_scanning.model.host_result import HostResult
-from port_scanning.port_scanner import PortScanner
+from richMap.port_scanning.model.host_result import HostResult
+from richMap.port_scanning.port_scanner import PortScanner
 
 
 # Socket Multithreading is bugged, doesnt recognize packet streams

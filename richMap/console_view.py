@@ -1,6 +1,6 @@
 import os
 
-from util.ansi_sequences import ansi_sequences
+from richMap.util.ansi_sequences import ansi_sequences
 
 
 class ConsoleView:

@@ -1,10 +1,10 @@
-from host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
-from host_discovery.scans.arp_discovery import ArpDiscovery
-from host_discovery.scans.ping_discovery import PingDiscovery
-from host_discovery.scans.syn_discovery import SynDiscovery
-from abstract_scanner_factory import AbstractScannerFactory
-from scanner_socket.socket_type import SocketType
-from scanner_socket.scanner_socket import ScannerSocket
+from richMap.host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
+from richMap.host_discovery.scans.arp_discovery import ArpDiscovery
+from richMap.host_discovery.scans.ping_discovery import PingDiscovery
+from richMap.host_discovery.scans.syn_discovery import SynDiscovery
+from richMap.abstract_scanner_factory import AbstractScannerFactory
+from richMap.scanner_socket.socket_type import SocketType
+from richMap.scanner_socket.scanner_socket import ScannerSocket
 
 
 class HostDiscoveryScanFactory(AbstractScannerFactory):

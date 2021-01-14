@@ -1,12 +1,8 @@
-from host_discovery.model.network_discovery_result import NetworkDiscoveryResult
-from host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
-from host_discovery.scans.arp_discovery import ArpDiscovery
-from host_discovery.scans.fin_discovery import FinDiscovery
-from host_discovery.scans.null_discovery import NullDiscovery
-from host_discovery.scans.ping_discovery import PingDiscovery
-from host_discovery.scans.syn_discovery import SynDiscovery
-from host_discovery.scans.xmas_discovery import XmasDiscovery
-from host_discovery.viewmodel.host_discovery_vm import HostDiscoveryViewModel
+from richMap.host_discovery.model.network_discovery_result import NetworkDiscoveryResult
+from richMap.host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
+from richMap.host_discovery.scans.arp_discovery import ArpDiscovery
+from richMap.host_discovery.scans.syn_discovery import SynDiscovery
+from richMap.host_discovery.viewmodel.host_discovery_vm import HostDiscoveryViewModel
 
 
 class NetworkDiscoveryViewModel:
@@ -24,10 +20,6 @@ class NetworkDiscoveryViewModel:
 
         host_discovery_type_switcher = {
             ArpDiscovery: "ARP Discovery",
-            FinDiscovery: "FIN Discovery",
-            NullDiscovery:  "Null Discovery",
-            PingDiscovery:  "Ping Discovery",
-            XmasDiscovery:  "Xmas Discovery",
             SynDiscovery: "SYN Discovery"
         }
         return host_discovery_type_switcher[host_discovery_type]

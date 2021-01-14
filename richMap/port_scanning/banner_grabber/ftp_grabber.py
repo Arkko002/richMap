@@ -1,4 +1,4 @@
-from port_scanning.banner_grabber.abstract_banner_grabber import AbstractBannerGrabber
+from richMap.port_scanning.banner_grabber.abstract_banner_grabber import AbstractBannerGrabber
 
 
 class FTPGrabber(AbstractBannerGrabber):

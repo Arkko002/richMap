@@ -1,6 +1,6 @@
-from port_scanning.model.port_state import PortState
-from port_scanning.model.port_result import PortResult
-from port_scanning.scans.abstract_port_scan import AbstractPortScan
+from richMap.port_scanning.model.port_state import PortState
+from richMap.port_scanning.model.port_result import PortResult
+from richMap.port_scanning.scans.abstract_port_scan import AbstractPortScan
 from scapy.layers.inet import IP, TCP
 
 

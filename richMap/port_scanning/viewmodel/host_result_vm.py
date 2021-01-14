@@ -1,13 +1,13 @@
-from port_scanning.model.host_result import HostResult
-from port_scanning.scans.ack_scan import AckPortScan
-from port_scanning.scans.fin_scan import FinPortScan
-from port_scanning.scans.maimon_scan import MaimonPortScan
-from port_scanning.scans.null_scan import NullPortScan
-from port_scanning.scans.window_scan import WindowPortScan
-from port_scanning.scans.xmas_scan import XmasPortScan
-from port_scanning.viewmodel.port_result_wm import PortResultViewModel
+from richMap.port_scanning.model.host_result import HostResult
+from richMap.port_scanning.scans.ack_scan import AckPortScan
+from richMap.port_scanning.scans.fin_scan import FinPortScan
+from richMap.port_scanning.scans.maimon_scan import MaimonPortScan
+from richMap.port_scanning.scans.null_scan import NullPortScan
+from richMap.port_scanning.scans.window_scan import WindowPortScan
+from richMap.port_scanning.scans.xmas_scan import XmasPortScan
+from richMap.port_scanning.viewmodel.port_result_wm import PortResultViewModel
 # TODO from port_scanning.scans.syn_scan import SynPortScan
-from port_scanning.scans.tcp_scan import TcpPortScan
+from richMap.port_scanning.scans.tcp_scan import TcpPortScan
 
 
 class HostResultViewModel:

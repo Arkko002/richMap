@@ -1,6 +1,6 @@
 from abc import ABC
 
-from scanner_socket.scanner_socket import ScannerSocket
+from richMap.scanner_socket.scanner_socket import ScannerSocket
 
 
 class AbstractBaseScan(ABC):

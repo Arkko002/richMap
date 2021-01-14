@@ -1,7 +1,7 @@
-from exceptions.invalid_ip import InvalidIPError
-from port_scanning.scans.abstract_port_scan import AbstractPortScan
-from util.ip_util import verify_ipv4, verify_ipv6
-from port_scanning.model.host_result import HostResult
+from richMap.exceptions.invalid_ip import InvalidIPError
+from richMap.port_scanning.scans.abstract_port_scan import AbstractPortScan
+from richMap.util.ip_util import verify_ipv4, verify_ipv6
+from richMap.port_scanning.model.host_result import HostResult
 
 
 class PortScanner:

@@ -1,7 +1,7 @@
 import socket
 from scapy.layers.http import http_request
 
-from port_scanning.banner_grabber.abstract_banner_grabber import AbstractBannerGrabber
+from richMap.port_scanning.banner_grabber.abstract_banner_grabber import AbstractBannerGrabber
 
 
 class HTTPGrabber(AbstractBannerGrabber):

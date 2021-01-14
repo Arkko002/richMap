@@ -1,9 +1,9 @@
 import ipaddress
 
-from exceptions.invalid_ip import InvalidIPError
-from host_discovery.model.network_discovery_result import NetworkDiscoveryResult
-from host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
-from util.ip_util import verify_ipv4, verify_ipv6
+from richMap.exceptions.invalid_ip import InvalidIPError
+from richMap.host_discovery.model.network_discovery_result import NetworkDiscoveryResult
+from richMap.host_discovery.scans.abstract_host_discovery import AbstractHostDiscovery
+from richMap.util.ip_util import verify_ipv4, verify_ipv6
 
 
 class HostDiscoverer:
